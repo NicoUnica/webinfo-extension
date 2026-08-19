@@ -19,3 +19,5 @@ Extensión de Chrome para ver información de servidores web con banderas de pa�
 2. Activar **Modo desarrollador**
 3. Clic en **Cargar descomprimida**
 4. Seleccionar este directorio
+
+<img width="320" height="470" alt="image" src="https://github.com/user-attachments/assets/90d9b12f-3ce5-4508-a806-f85204a909c0" />
