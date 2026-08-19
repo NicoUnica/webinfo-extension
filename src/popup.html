@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <span id="coords" hidden></span>
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="error" class="state-msg" style="display:none">
+      <div id="error-msg" class="error-text"></div>
+      <button id="error-retry" class="error-retry" data-i18n="retry">Retry</button>
+    </div>
+
+    <div id="content" style="display:none">
+      <div class="header">
+        <img id="flag-img" class="flag" src="../assets/icons/icon48.png" alt="">
+        <div class="header-info">
+          <div class="country-row">
+            <div id="country" class="country-name"></div>
+          </div>
+          <div id="city-region" class="city-text"></div>
+        </div>
+      </div>
+
+      <div id="map-container" class="map-wrap" style="display:none">
+        <div id="map-grid" class="map-grid"></div>
+        <div id="map-pin" class="map-pin"></div>
+        <div id="map-loading" class="map-loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <div id="map-context-menu" class="map-context-menu" hidden>
+        <button id="map-open" type="button" data-i18n="openInMaps">Open in Maps</button>
+      </div>
+
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label-cell">IP</span>
+          <div class="value-wrap">
+            <a id="ip" class="value-main link-value" href="#" target="_blank" rel="noopener noreferrer"></a>
+            <span id="ip-source" class="source-badge"></span>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="label-cell" data-i18n="domain">Domain</span>
+          <div class="value-wrap">
+            <a id="domain" class="value-main domain link-value" href="#" target="_blank" rel="noopener noreferrer"></a>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="label-cell">ASN</span>
+          <div class="value-wrap">
+            <a id="asn" class="value-main link-value" href="#" target="_blank" rel="noopener noreferrer"></a>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="label-cell">ISP</span>
+          <div class="value-wrap">
+            <span id="isp" class="value-main plain-value"></span>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="label-cell" data-i18n="timezone">Time zone</span>
+          <div class="value-wrap">
+            <span id="timezone" class="value-main plain-value"></span>
+          </div>
+        </div>
+        <div class="info-row ssl-row ssl-expanded">
+          <span class="label-cell">SSL</span>
+          <div class="value-wrap">
+            <button id="ssl-toggle" class="value-main ssl-value" type="button" aria-expanded="false"></button>
+          </div>
+          <button class="expand-btn" type="button" data-expand="ssl-details">
+            <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div id="ssl-details" class="ssl-details-inline" hidden>
+          <div><span data-i18n="sslIssuer">Issuer</span><strong id="ssl-issuer">--</strong></div>
+          <div><span data-i18n="sslValidTo">Valid to</span><strong id="ssl-valid-to">--</strong></div>
+          <div><span data-i18n="sslHost">Host</span><strong id="ssl-host">--</strong></div>
+        </div>
+        <div class="info-row whois-row whois-expanded">
+          <span class="label-cell">WHOIS</span>
+          <div class="value-wrap">
+            <button id="whois-toggle" class="value-main whois-value" type="button" aria-expanded="false">--</button>
+          </div>
+          <button class="expand-btn" type="button" data-expand="whois-details">
+            <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div id="whois-details" class="whois-details-inline" hidden>
+          <div><span data-i18n="whoisRegistrar">Registrador</span><strong id="whois-registrar">--</strong></div>
+          <div><span data-i18n="whoisCreated">Creado</span><strong id="whois-created">--</strong></div>
+          <div><span data-i18n="whoisExpires">Expira</span><strong id="whois-expires">--</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

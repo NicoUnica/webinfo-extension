@@ -1,0 +1,9 @@
+.DS_Store
+
+# Local extension release archive
+WebInfo-*.zip
+
+# Local editor and OS files
+.vscode/
+.idea/
+*.log

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebInfo — Privacy Policy</title>
+<style>
+  body { font-family: "Helvetica Neue", Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #333; line-height: 1.8; }
+  h1 { font-size: 24px; margin-bottom: 8px; }
+  h2 { font-size: 18px; margin-top: 28px; }
+  .date { color: #888; font-size: 14px; margin-bottom: 30px; }
+  p { margin: 10px 0; }
+  ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<h1>WebInfo — Privacy Policy</h1>
+<div class="date">Last updated: August 3, 2026</div>
+
+<h2>Overview</h2>
+<p>WebInfo is a browser extension that shows the server country flag and IP geolocation of the websites you visit. It is designed to collect as little data as possible.</p>
+
+<h2>Data we process</h2>
+<p>The extension processes only the following:</p>
+<ul>
+  <li><strong>Website hostname / server IP</strong>: The hostname (or resolved IP) of the site in your active tab is sent to the geolocation API to look up its server location — country, city, coordinates, ASN and ISP. This is the location of the <em>website's server</em>, not your own location.</li>
+</ul>
+
+<h2>Data we do NOT collect</h2>
+<ul>
+  <li>Personal information (name, email, etc.)</li>
+  <li>Browsing history</li>
+  <li>User activity (clicks, scrolling, keystrokes)</li>
+  <li>Page content, form fields or cookies</li>
+  <li>Passwords or financial information</li>
+</ul>
+
+<h2>How data is used</h2>
+<p>Lookup results are only used to display information inside the extension. They are cached in the browser's session storage and cleared automatically when the browsing session ends. Nothing is stored on a permanent server on your behalf.</p>
+
+<h2>Third-party services</h2>
+<p>To perform a lookup, the extension contacts the following services:</p>
+<ul>
+  <li><strong>ipwho.is</strong> — receives the hostname or server IP and returns geolocation details. It may forward the IP address to the geolocation provider <a href="https://ipapi.is">ipapi.is</a>. Only the IP address is forwarded — never your identity, page content or hostname beyond what is needed for the lookup.</li>
+  <li><strong>cloudflare-dns.com</strong> — used for DNS-over-HTTPS to resolve a hostname to an IPv4 address when needed.</li>
+  <li><strong>map.bluecdn.com</strong> — serves the map preview image.</li>
+</ul>
+
+<h2>Data attribution</h2>
+<p>Fallback geolocation databases are attributed as required by their licenses:</p>
+<ul>
+  <li><a href="https://db-ip.com">IP Geolocation by DB-IP</a> (DB-IP Lite, CC BY 4.0)</li>
+  <li><a href="https://www.maxmind.com">GeoLite data by MaxMind</a></li>
+</ul>
+
+<h2>Changes</h2>
+<p>This privacy policy may be updated from time to time. Any changes will be published on this page.</p>
+</body>
+</html>
