@@ -4,7 +4,7 @@
   "short_name": "WebInfo",
   "version": "2.0.0",
   "description": "__MSG_extensionDescription__",
-  "default_locale": "es",
+  "default_locale": "en",
   "permissions": [
     "activeTab",
     "tabs",
