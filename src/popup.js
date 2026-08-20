@@ -647,14 +647,6 @@ async function init() {
       if (!raw) throw new Error('domain lookup failed');
       const data = normalizeData(raw, raw.ip);
       
-      // Obtener información WHOIS del dominio
-      try {
-        const whois = await fetchWhoisJson(hostname);
-        if (whois) data.whois = whois;
-      } catch {
-        // WHOIS es opcional, continuar sin él
-      }
-
       await chrome.storage.session.set({ [`geo_${hostname}`]: { data, ts: Date.now() } });
       render(data, hostname, 'dns', flagStyle);
       return;
@@ -677,14 +669,6 @@ async function init() {
     const raw = await fetchGeoJson(ip);
     if (!raw) throw new Error('API error');
     const data = normalizeData(raw, ip);
-    
-    // Obtener información WHOIS del dominio
-    try {
-      const whois = await fetchWhoisJson(hostname);
-      if (whois) data.whois = whois;
-    } catch {
-      // WHOIS es opcional, continuar sin él
-    }
     
     await chrome.storage.session.set({ [key]: { data, ts: Date.now() } });
     render(data, hostname, preferred.source, flagStyle);
