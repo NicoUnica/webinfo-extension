@@ -633,6 +633,12 @@ async function init() {
   const settings = await chrome.storage.sync.get({ [FLAG_STYLE_KEY]: DEFAULT_FLAG_STYLE });
   const flagStyle = setFlagStyle(settings[FLAG_STYLE_KEY]);
 
+  // SSL y WHOIS solo dependen del hostname: se lanzan ya, en paralelo con la resolución de
+  // geolocalización, y cada uno se pinta al llegar (o queda en '--' si su servicio falla).
+  resetDetailPanels();
+  loadSslInfo(hostname);
+  loadWhoisInfo(hostname);
+
   // 0. Leer IP de conexión cacheada por webRequest, priorizar IPv4, v6 usa DoH para buscar registro A
   const ipKey = `ip_${hostname}`;
   const sourceKey = `ip_source_${hostname}`;
