@@ -240,8 +240,13 @@ function latToWorldY(lat, z) {
   return ((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * Math.pow(2, z) * 256;
 }
 
+// El tile style sigue el esquema de color del sistema para que el mapa combine con el tema del popup.
+function getMapStyle() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark_all' : 'light_all';
+}
+
 function getMapTiles(lat, lon, width, height) {
-  const style = 'light_all';
+  const style = getMapStyle();
   const worldX = lonToWorldX(lon, TILE_ZOOM);
   const worldY = latToWorldY(lat, TILE_ZOOM);
   const centerTileX = Math.floor(worldX / 256);
@@ -539,15 +544,16 @@ function bindActions() {
 }
 
 function renderMap(data) {
-  if (!data.latitude || !data.longitude) {
+  const lat = parseFloat(data.latitude);
+  const lon = parseFloat(data.longitude);
+  // Number.isFinite descarta null/undefined/NaN sin tratar el 0 válido (Greenwich, ecuador) como ausente.
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     currentMapCoords = null;
     $('map-container').style.display = 'none';
     hideMapContextMenu();
     return;
   }
 
-  const lat = parseFloat(data.latitude);
-  const lon = parseFloat(data.longitude);
   currentMapCoords = { lat, lon };
   $('map-container').style.display = 'block';
   $('map-loading').style.display = 'flex';
@@ -653,7 +659,10 @@ async function init() {
       if (!raw) throw new Error('domain lookup failed');
       const data = normalizeData(raw, raw.ip);
       
-      await chrome.storage.session.set({ [`geo_${hostname}`]: { data, ts: Date.now() } });
+      // Cachear bajo la IP resuelta (misma clave que lee la ruta principal), no bajo el hostname.
+      if (data.ip) {
+        await chrome.storage.session.set({ [`geo_${data.ip}`]: { data, ts: Date.now() } });
+      }
       render(data, hostname, 'dns', flagStyle);
       return;
     } catch {
