@@ -406,6 +406,14 @@ async function loadSslInfo(hostname, embeddedSsl) {
   }
 }
 
+async function loadWhoisInfo(hostname) {
+  try {
+    renderWhois(await fetchWhoisInfo(hostname));
+  } catch {
+    renderWhois(null);
+  }
+}
+
 function renderWhois(data) {
   const button = $('whois-toggle');
   if (!button) return;
