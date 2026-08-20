@@ -571,10 +571,7 @@ function renderMap(data) {
   });
 }
 
-function render(data, hostname, ipSource, flagStyle) {
-  lastRenderData = data;
-  $('loading').style.display = 'none';
-  $('content').style.display = 'block';
+function resetDetailPanels() {
   const details = $('ssl-details');
   const sslToggle = $('ssl-toggle');
   if (details) details.hidden = true;
@@ -584,6 +581,13 @@ function render(data, hostname, ipSource, flagStyle) {
   const whoisToggle = $('whois-toggle');
   if (whoisDetails) whoisDetails.hidden = true;
   if (whoisToggle) whoisToggle.setAttribute('aria-expanded', 'false');
+}
+
+function render(data, hostname, ipSource, flagStyle) {
+  lastRenderData = data;
+  $('loading').style.display = 'none';
+  $('content').style.display = 'block';
+  resetDetailPanels();
 
   const flagCode = getFlagCode(data) || getFallbackFlagCode(hostname);
   setFlagStyle(flagStyle);
