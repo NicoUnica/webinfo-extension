@@ -69,6 +69,15 @@ function t(key) {
   return I18N[LOCALE][key] || I18N.en[key] || key;
 }
 
+// Localizar las etiquetas estáticas marcadas con data-i18n según el idioma del navegador.
+function applyStaticI18n() {
+  document.documentElement.lang = LOCALE;
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const value = I18N[LOCALE][el.dataset.i18n] || I18N.en[el.dataset.i18n];
+    if (value) el.textContent = value;
+  });
+}
+
 function setText(id, value) {
   const el = $(id);
   if (el) el.textContent = value;
@@ -324,7 +333,7 @@ function formatDateTime(value) {
   if (!value) return '--';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString(LOCALE === 'zh' ? 'zh-CN' : 'en-US', {
+  return date.toLocaleDateString(LOCALE === 'es' ? 'es-ES' : 'en-US', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -620,17 +629,7 @@ async function init() {
       } catch {
         // WHOIS es opcional, continuar sin él
       }
-      
-      // Obtener reputación de la IP si está disponible
-      if (data.ip) {
-        try {
-          const reputation = await fetchIpReputation(data.ip);
-          if (reputation) data.reputation = reputation;
-        } catch {
-          // Reputación es opcional, continuar sin ella
-        }
-      }
-      
+
       await chrome.storage.session.set({ [`geo_${hostname}`]: { data, ts: Date.now() } });
       render(data, hostname, 'dns', flagStyle);
       return;
@@ -679,6 +678,7 @@ function bindSystemThemeListener() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  applyStaticI18n();
   bindRetry();
   bindMapContextMenu();
   bindActions();
