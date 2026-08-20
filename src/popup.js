@@ -1,6 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const CACHE_TTL = 10 * 60 * 1000;
 const SSL_CACHE_TTL = 6 * 60 * 60 * 1000;
+const WHOIS_CACHE_TTL = 24 * 60 * 60 * 1000;
 const TILE_HOST = 'https://{s}.basemaps.cartocdn.com';
 const TILE_ZOOM = 4; // Vista a nivel nacional, 2x2 tiles acercados a zoom 5 nivel ciudad
 const FLAG_STYLE_KEY = 'flagStyle';
