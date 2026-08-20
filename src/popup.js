@@ -605,8 +605,6 @@ function render(data, hostname, ipSource, flagStyle) {
   setText('isp', data.isp || '--');
   setText('timezone', data.timezone || '--');
   renderIpSource(ipSource);
-  loadSslInfo(hostname, data.ssl);
-  renderWhois(data.whois);
 }
 
 function showError(msg) {
