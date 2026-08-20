@@ -171,6 +171,20 @@ async function fetchSslInfo(hostname) {
   return data;
 }
 
+async function fetchWhoisInfo(hostname) {
+  const key = `whois_${hostname}`;
+  const store = await chrome.storage.session.get(key);
+  if (store[key] && Date.now() - store[key].ts < WHOIS_CACHE_TTL) {
+    return store[key].data;
+  }
+
+  const data = await fetchWhoisJson(hostname);
+  if (data) {
+    await chrome.storage.session.set({ [key]: { data, ts: Date.now() } });
+  }
+  return data;
+}
+
 // Extraer número ASN del campo ASN
 // "AS37963 Hangzhou Alibaba Advertising Co.,Ltd." → "AS37963"
 // "AS15169" → "AS15169"
