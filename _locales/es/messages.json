@@ -4,14 +4,5 @@
   },
   "extensionDescription": {
     "message": "Vea el país del servidor web de un vistazo y consulte información de IP, ASN, ISP, ciudad y zona horaria."
-  },
-  "whoisRegistrar": {
-    "message": "Registrador"
-  },
-  "whoisCreated": {
-    "message": "Creado"
-  },
-  "whoisExpires": {
-    "message": "Expira"
   }
 }

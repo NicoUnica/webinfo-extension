@@ -7,11 +7,11 @@ const TILE_ZOOM = 4; // Vista a nivel nacional, 2x2 tiles acercados a zoom 5 niv
 const FLAG_STYLE_KEY = 'flagStyle';
 const DEFAULT_FLAG_STYLE = 'rect';
 
-const COUNTRY_ES = {
-  US: 'Estados Unidos', CN: 'China', SG: 'Singapur', JP: 'Japón', KR: 'Corea del Sur',
-  HK: 'Hong Kong', MO: 'Macau', TW: 'Taiwán', GB: 'Reino Unido',
-  DE: 'Alemania', FR: 'Francia', RU: 'Rusia', ES: 'España', IN: 'India',
-  AU: 'Australia', CA: 'Canadá', NL: 'Países Bajos', TR: 'Turquía',
+// Nombres cortos para las regiones que Intl.DisplayNames devuelve de forma verbosa
+// (p. ej. "RAE de Hong Kong (China)"). El resto de países se traducen con Intl.DisplayNames.
+const REGION_SHORT_NAMES = {
+  es: { hk: 'Hong Kong', mo: 'Macau', tw: 'Taiwán' },
+  en: { hk: 'Hong Kong', mo: 'Macau', tw: 'Taiwan' },
 };
 
 const I18N = {
@@ -61,7 +61,16 @@ const I18N = {
   },
 };
 
-const LOCALE = /^es/i.test(navigator.language || '') ? 'es' : 'en';
+// Idioma del popup: usamos el mismo idioma que la interfaz de la extensión (el nombre y la
+// descripción del manifest vienen de _locales según el idioma del navegador). Así TODO el popup
+// queda en un único idioma —inglés o español— elegido por el navegador del usuario, sin mezclas.
+function detectLocale() {
+  let lang = '';
+  try { lang = chrome.i18n.getUILanguage() || ''; } catch { /* chrome.i18n no disponible */ }
+  if (!lang) lang = navigator.language || '';
+  return /^es/i.test(lang) ? 'es' : 'en';
+}
+const LOCALE = detectLocale();
 let currentMapCoords = null;
 let lastRenderData = null;
 let lastSslData = null;
@@ -292,12 +301,32 @@ function getFallbackFlagCode(hostname) {
   return '';
 }
 
+// Traducir códigos ISO de país (US, BR, IT, ...) al idioma activo con la API nativa del navegador,
+// que cubre todos los países. Memoizado; si Intl.DisplayNames no existe, devuelve '' y se usa el fallback.
+let _regionNames;
+function localizeCountry(countryCode) {
+  const cc = (countryCode || '').toUpperCase();
+  if (!cc) return '';
+  if (_regionNames === undefined) {
+    try {
+      _regionNames = new Intl.DisplayNames([LOCALE, 'en'], { type: 'region' });
+    } catch {
+      _regionNames = null;
+    }
+  }
+  if (_regionNames) {
+    try {
+      const name = _regionNames.of(cc);
+      if (name && name.toUpperCase() !== cc) return name;
+    } catch { /* código de región no válido */ }
+  }
+  return '';
+}
+
 function getDisplayName(data, flagCode) {
-  if (flagCode === 'hk') return LOCALE === 'es' ? 'Hong Kong' : (data.region || data.province || data.city || 'Hong Kong');
-  if (flagCode === 'mo') return LOCALE === 'es' ? 'Macau' : (data.region || data.province || data.city || 'Macau');
-  if (flagCode === 'tw') return LOCALE === 'es' ? 'Taiwán' : (data.region || data.province || data.city || 'Taiwan');
-  if (LOCALE === 'es') return COUNTRY_ES[(data.country_code || '').toUpperCase()] || data.country || data.country_code || '--';
-  return data.country || data.country_code || '--';
+  const shortName = REGION_SHORT_NAMES[LOCALE]?.[flagCode] || REGION_SHORT_NAMES.en[flagCode];
+  if (shortName) return shortName;
+  return localizeCountry(data.country_code) || data.country || data.country_code || '--';
 }
 
 function setFlagImage(flagCode) {
