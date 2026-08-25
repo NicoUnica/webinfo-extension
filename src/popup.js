@@ -31,6 +31,7 @@ const I18N = {
     sslValidTo: 'Valid to',
     sslHost: 'Host',
     sourceDns: 'DNS',
+    sourceDnsTitle: 'Resolved via DNS over HTTPS',
     locationSeparator: ', ',
     whoisRegistrar: 'Registrar',
     whoisCreated: 'Created',
@@ -52,6 +53,7 @@ const I18N = {
     sslValidTo: 'Válido hasta',
     sslHost: 'Dominio',
     sourceDns: 'DNS',
+    sourceDnsTitle: 'Resuelto mediante DNS sobre HTTPS',
     locationSeparator: ', ',
     whoisRegistrar: 'Registrador',
     whoisCreated: 'Creado',
@@ -388,7 +390,7 @@ function renderIpSource() {
   const el = $('ip-source');
   if (!el) return;
   el.textContent = t('sourceDns');
-  el.title = 'DNS A';
+  el.title = t('sourceDnsTitle');
 }
 
 function getSslClass(daysLeft, status) {
