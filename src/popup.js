@@ -6,6 +6,7 @@ const TILE_HOST = 'https://{s}.basemaps.cartocdn.com';
 const TILE_ZOOM = 4; // Vista a nivel nacional, 2x2 tiles acercados a zoom 5 nivel ciudad
 const FLAG_STYLE_KEY = 'flagStyle';
 const DEFAULT_FLAG_STYLE = 'rect';
+const UI_LANG_KEY = 'uiLang';
 
 // Nombres cortos para las regiones que Intl.DisplayNames devuelve de forma verbosa
 // (p. ej. "RAE de Hong Kong (China)"). El resto de países se traducen con Intl.DisplayNames.
@@ -27,6 +28,7 @@ const I18N = {
     a11yCopyDomain: 'Copy domain',
     a11yCopyAsn: 'Copy ASN',
     copied: 'Copied',
+    a11yLanguage: 'Language',
 
     unsupportedPage: 'This page cannot be checked',
     resolveFailed: 'Unable to resolve server IP. Check your network and try again.',
@@ -56,6 +58,7 @@ const I18N = {
     a11yCopyDomain: 'Copiar el dominio',
     a11yCopyAsn: 'Copiar el ASN',
     copied: 'Copiado',
+    a11yLanguage: 'Idioma',
 
     unsupportedPage: 'Esta página no puede ser verificada',
     resolveFailed: 'No se pudo resolver la IP del servidor. Verifica tu red e intenta de nuevo.',
@@ -84,10 +87,12 @@ function detectLocale() {
   if (!lang) lang = navigator.language || '';
   return /^es/i.test(lang) ? 'es' : 'en';
 }
-const LOCALE = detectLocale();
+let LOCALE = detectLocale();
 let currentMapCoords = null;
 let lastRenderData = null;
+let lastRenderCtx = null;
 let lastSslData = null;
+let lastWhoisData = null;
 
 function t(key) {
   return I18N[LOCALE][key] || I18N.en[key] || key;
@@ -110,6 +115,56 @@ function applyStaticI18n() {
     const value = I18N[LOCALE][el.dataset.i18nAria] || I18N.en[el.dataset.i18nAria];
     if (value) el.setAttribute('aria-label', value);
   });
+}
+
+// Preferencia de idioma manual (chrome.storage.sync). Si existe, prevalece sobre la detección automática.
+async function loadStoredLocale() {
+  try {
+    const { [UI_LANG_KEY]: stored } = await chrome.storage.sync.get(UI_LANG_KEY);
+    if (stored === 'en' || stored === 'es') LOCALE = stored;
+  } catch { /* storage no disponible: usar el idioma detectado */ }
+}
+
+function applyLanguageSelectorState() {
+  document.querySelectorAll('[data-lang]').forEach((btn) => {
+    const active = btn.dataset.lang === LOCALE;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+}
+
+// Cambiar el idioma manualmente: persistir, reconstruir textos estáticos y re-pintar lo dinámico.
+async function setLocale(lang) {
+  if ((lang !== 'en' && lang !== 'es') || lang === LOCALE) return;
+  LOCALE = lang;
+  _regionNames = undefined; // rehacer Intl.DisplayNames para el nuevo idioma
+  try { await chrome.storage.sync.set({ [UI_LANG_KEY]: lang }); } catch { /* ignorar */ }
+  refreshLocaleText();
+}
+
+// Re-aplica solo el texto dependiente del idioma, sin recargar el mapa ni cerrar los paneles abiertos.
+function refreshLocaleText() {
+  applyStaticI18n();
+  applyLanguageSelectorState();
+  if (lastRenderCtx) {
+    const { data, hostname } = lastRenderCtx;
+    const flagCode = getFlagCode(data) || getFallbackFlagCode(hostname);
+    setText('country', getDisplayName(data, flagCode));
+    setText('city-region', [data.city, data.province].filter(Boolean).join(t('locationSeparator')) || '--');
+    setText('timezone', formatTimeZone(data.timezone));
+    renderIpSource();
+  }
+  renderSsl(lastSslData);
+  renderWhois(lastWhoisData);
+}
+
+function bindLanguageSelector() {
+  document.querySelectorAll('[data-lang]').forEach((btn) => {
+    if (btn._bound) return;
+    btn.addEventListener('click', () => setLocale(btn.dataset.lang));
+    btn._bound = true;
+  });
+  applyLanguageSelectorState();
 }
 
 function setText(id, value) {
@@ -522,6 +577,7 @@ async function loadWhoisInfo(hostname) {
 }
 
 function renderWhois(data) {
+  lastWhoisData = data;
   const button = $('whois-toggle');
   if (!button) return;
   
@@ -703,6 +759,7 @@ function resetDetailPanels() {
 
 function render(data, hostname, flagStyle) {
   lastRenderData = data;
+  lastRenderCtx = { data, hostname, flagStyle };
   $('loading').style.display = 'none';
   $('content').style.display = 'block';
   resetDetailPanels();
@@ -810,11 +867,13 @@ function bindSystemThemeListener() {
   else mq.addListener(onChange);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadStoredLocale();
   applyStaticI18n();
   bindRetry();
   bindMapContextMenu();
   bindActions();
+  bindLanguageSelector();
   bindSystemThemeListener();
   init();
 });
