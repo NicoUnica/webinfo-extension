@@ -79,6 +79,11 @@ function t(key) {
   return I18N[LOCALE][key] || I18N.en[key] || key;
 }
 
+// Etiqueta BCP-47 para las APIs Intl según el idioma activo del popup.
+function localeTag() {
+  return LOCALE === 'es' ? 'es-ES' : 'en-US';
+}
+
 // Localizar las etiquetas estáticas marcadas con data-i18n según el idioma del navegador.
 function applyStaticI18n() {
   document.documentElement.lang = LOCALE;
@@ -379,11 +384,23 @@ function formatDateTime(value) {
   if (!value) return '--';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString(LOCALE === 'es' ? 'es-ES' : 'en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
+  // "medium" da una fecha legible e idiomática por idioma: "Aug 20, 2026" / "20 ago 2026".
+  return date.toLocaleDateString(localeTag(), { dateStyle: 'medium' });
+}
+
+// Mostrar la zona horaria IANA junto a su desfase UTC actual, p. ej. "America/New_York (GMT-4)".
+function formatTimeZone(tz) {
+  if (!tz) return '--';
+  try {
+    const parts = new Intl.DateTimeFormat(localeTag(), {
+      timeZone: tz,
+      timeZoneName: 'shortOffset',
+    }).formatToParts(new Date());
+    const offset = parts.find((p) => p.type === 'timeZoneName')?.value;
+    return offset ? `${tz} (${offset})` : tz;
+  } catch {
+    return tz;
+  }
 }
 
 function renderIpSource() {
@@ -634,7 +651,7 @@ function render(data, hostname, flagStyle) {
   setWhoisLink('domain', hostname);
   setWhoisLink('asn', asn === '--' ? '' : asn);
   setText('isp', data.isp || '--');
-  setText('timezone', data.timezone || '--');
+  setText('timezone', formatTimeZone(data.timezone));
   renderIpSource();
 }
 
