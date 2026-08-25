@@ -23,6 +23,10 @@ const I18N = {
     a11yLoading: 'Loading server information',
     a11yToggleSsl: 'Toggle SSL certificate details',
     a11yToggleWhois: 'Toggle WHOIS details',
+    a11yCopyIp: 'Copy IP address',
+    a11yCopyDomain: 'Copy domain',
+    a11yCopyAsn: 'Copy ASN',
+    copied: 'Copied',
 
     unsupportedPage: 'This page cannot be checked',
     resolveFailed: 'Unable to resolve server IP. Check your network and try again.',
@@ -48,6 +52,10 @@ const I18N = {
     a11yLoading: 'Cargando información del servidor',
     a11yToggleSsl: 'Mostrar u ocultar detalles del certificado SSL',
     a11yToggleWhois: 'Mostrar u ocultar detalles WHOIS',
+    a11yCopyIp: 'Copiar la dirección IP',
+    a11yCopyDomain: 'Copiar el dominio',
+    a11yCopyAsn: 'Copiar el ASN',
+    copied: 'Copiado',
 
     unsupportedPage: 'Esta página no puede ser verificada',
     resolveFailed: 'No se pudo resolver la IP del servidor. Verifica tu red e intenta de nuevo.',
@@ -388,6 +396,27 @@ function setWhoisLink(id, value) {
     el.removeAttribute('href');
     el.classList.add('disabled');
   }
+  // El botón de copiar solo aparece cuando hay un valor real que copiar.
+  const copyBtn = $(`copy-${id}`);
+  if (copyBtn) {
+    copyBtn.hidden = !value;
+    copyBtn.classList.remove('copied');
+  }
+}
+
+// Copiar al portapapeles el texto del valor asociado, con confirmación visual breve.
+async function copyValue(btn) {
+  const target = $(btn.dataset.copy);
+  const text = target?.textContent?.trim();
+  if (!text || text === '--') return;
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.classList.add('copied');
+    btn.title = t('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1200);
+  } catch {
+    /* portapapeles no disponible */
+  }
 }
 
 
@@ -597,6 +626,12 @@ function bindActions() {
   document.querySelectorAll('[data-expand]').forEach((button) => {
     if (button._bound) return;
     button.addEventListener('click', () => handleExpandButtonClick(button));
+    button._bound = true;
+  });
+
+  document.querySelectorAll('[data-copy]').forEach((button) => {
+    if (button._bound) return;
+    button.addEventListener('click', () => copyValue(button));
     button._bound = true;
   });
 }
