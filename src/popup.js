@@ -30,7 +30,6 @@ const I18N = {
     sslIssuer: 'Issuer',
     sslValidTo: 'Valid to',
     sslHost: 'Host',
-    sourceConnection: 'Conn',
     sourceDns: 'DNS',
     locationSeparator: ', ',
     whoisRegistrar: 'Registrar',
@@ -52,7 +51,6 @@ const I18N = {
     sslIssuer: 'Emisor',
     sslValidTo: 'Válido hasta',
     sslHost: 'Dominio',
-    sourceConnection: 'Conexión',
     sourceDns: 'DNS',
     locationSeparator: ', ',
     whoisRegistrar: 'Registrador',
@@ -223,22 +221,19 @@ async function resolveIpDoH(hostname) {
   }
 }
 
-// Priorizar IPv4: si ya hay v4 usarlo directamente, si no DoH busca registro A, finalmente fallback a v6
-async function getPreferredIp(hostname, cachedIp, cachedSource) {
-  if (cachedIp && isIPv4(cachedIp)) {
-    return { ip: cachedIp, source: cachedSource || 'connection' };
-  }
+// Resolver hostname → IPv4 vía DNS-over-HTTPS. El resultado se cachea en la sesión para
+// evitar repetir la consulta DoH al reabrir el popup en el mismo host.
+async function resolveHostIp(hostname) {
+  const key = `ip_${hostname}`;
+  const cached = (await chrome.storage.session.get(key))[key];
+  if (cached && isIPv4(cached)) return cached;
 
   const v4 = await resolveIpDoH(hostname);
   if (v4) {
-    await chrome.storage.session.set({
-      [`ip_${hostname}`]: v4,
-      [`ip_source_${hostname}`]: 'dns',
-    });
-    return { ip: v4, source: 'dns' };
+    await chrome.storage.session.set({ [key]: v4 });
+    return v4;
   }
-
-  return cachedIp ? { ip: cachedIp, source: cachedSource || 'connection' } : null;
+  return null;
 }
 
 function lonToWorldX(lon, z) {
@@ -389,12 +384,11 @@ function formatDateTime(value) {
   });
 }
 
-function renderIpSource(source) {
+function renderIpSource() {
   const el = $('ip-source');
   if (!el) return;
-  const isDns = source === 'dns';
-  el.textContent = isDns ? t('sourceDns') : t('sourceConnection');
-  el.title = isDns ? 'DNS A' : 'webRequest';
+  el.textContent = t('sourceDns');
+  el.title = 'DNS A';
 }
 
 function getSslClass(daysLeft, status) {
@@ -618,7 +612,7 @@ function resetDetailPanels() {
   if (whoisToggle) whoisToggle.setAttribute('aria-expanded', 'false');
 }
 
-function render(data, hostname, ipSource, flagStyle) {
+function render(data, hostname, flagStyle) {
   lastRenderData = data;
   $('loading').style.display = 'none';
   $('content').style.display = 'block';
@@ -639,7 +633,7 @@ function render(data, hostname, ipSource, flagStyle) {
   setWhoisLink('asn', asn === '--' ? '' : asn);
   setText('isp', data.isp || '--');
   setText('timezone', data.timezone || '--');
-  renderIpSource(ipSource);
+  renderIpSource();
 }
 
 function showError(msg) {
@@ -674,25 +668,21 @@ async function init() {
   loadSslInfo(hostname);
   loadWhoisInfo(hostname);
 
-  // 0. Leer IP de conexión cacheada por webRequest, priorizar IPv4, v6 usa DoH para buscar registro A
-  const ipKey = `ip_${hostname}`;
-  const sourceKey = `ip_source_${hostname}`;
-  const ipStore = await chrome.storage.session.get([ipKey, sourceKey]);
-  const preferred = await getPreferredIp(hostname, ipStore[ipKey], ipStore[sourceKey]);
-  const ip = preferred?.ip;
+  // Resolver la IPv4 del host vía DNS-over-HTTPS (con cache de sesión).
+  const ip = await resolveHostIp(hostname);
 
   if (!ip) {
-    // webRequest puede no obtener IP de conexión en algunos modos VPN/privacidad, dejar que API resuelva por dominio.
+    // Si la resolución DoH falla, dejar que la API intente resolver por dominio directamente.
     try {
       const raw = await fetchDomainJson(hostname);
       if (!raw) throw new Error('domain lookup failed');
       const data = normalizeData(raw, raw.ip);
-      
+
       // Cachear bajo la IP resuelta (misma clave que lee la ruta principal), no bajo el hostname.
       if (data.ip) {
         await chrome.storage.session.set({ [`geo_${data.ip}`]: { data, ts: Date.now() } });
       }
-      render(data, hostname, 'dns', flagStyle);
+      render(data, hostname, flagStyle);
       return;
     } catch {
       showError(t('resolveFailed'));
@@ -700,22 +690,22 @@ async function init() {
     }
   }
 
-  // 3. Buscar cache geo (usando IP como key, reutilizable cuando múltiples dominios comparten IP CDN)
+  // Buscar cache geo (usando IP como key, reutilizable cuando múltiples dominios comparten IP CDN)
   const key = `geo_${ip}`;
   const store = await chrome.storage.session.get(key);
   if (store[key] && Date.now() - store[key].ts < CACHE_TTL) {
-    render(store[key].data, hostname, preferred.source, flagStyle);
+    render(store[key].data, hostname, flagStyle);
     return;
   }
 
-  // 4. Llamar a API de geolocalización
+  // Llamar a API de geolocalización
   try {
     const raw = await fetchGeoJson(ip);
     if (!raw) throw new Error('API error');
     const data = normalizeData(raw, ip);
-    
+
     await chrome.storage.session.set({ [key]: { data, ts: Date.now() } });
-    render(data, hostname, preferred.source, flagStyle);
+    render(data, hostname, flagStyle);
   } catch {
     showError(t('fetchFailed'));
   }
