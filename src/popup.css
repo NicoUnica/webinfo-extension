@@ -386,6 +386,14 @@ body {
   text-decoration: none;
 }
 
+/* Foco visible para navegación por teclado (no afecta al clic de ratón). */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .ssl-value {
   border: 0;
   background: transparent;

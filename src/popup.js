@@ -20,6 +20,9 @@ const I18N = {
     domain: 'Domain',
     timezone: 'Time zone',
     openInMaps: 'Open in Maps',
+    a11yLoading: 'Loading server information',
+    a11yToggleSsl: 'Toggle SSL certificate details',
+    a11yToggleWhois: 'Toggle WHOIS details',
 
     unsupportedPage: 'This page cannot be checked',
     resolveFailed: 'Unable to resolve server IP. Check your network and try again.',
@@ -42,6 +45,9 @@ const I18N = {
     domain: 'Dominio',
     timezone: 'Zona horaria',
     openInMaps: 'Abrir en mapas',
+    a11yLoading: 'Cargando información del servidor',
+    a11yToggleSsl: 'Mostrar u ocultar detalles del certificado SSL',
+    a11yToggleWhois: 'Mostrar u ocultar detalles WHOIS',
 
     unsupportedPage: 'Esta página no puede ser verificada',
     resolveFailed: 'No se pudo resolver la IP del servidor. Verifica tu red e intenta de nuevo.',
@@ -90,6 +96,11 @@ function applyStaticI18n() {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const value = I18N[LOCALE][el.dataset.i18n] || I18N.en[el.dataset.i18n];
     if (value) el.textContent = value;
+  });
+  // aria-label localizado para controles sin texto visible (spinner, chevrons de expandir).
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+    const value = I18N[LOCALE][el.dataset.i18nAria] || I18N.en[el.dataset.i18nAria];
+    if (value) el.setAttribute('aria-label', value);
   });
 }
 
@@ -335,7 +346,8 @@ function setFlagImage(flagCode) {
   const img = $('flag-img');
   if (!img) return;
   img.style.display = 'block';
-  img.alt = flagCode ? flagCode.toUpperCase() : '';
+  // Decorativa: el nombre del país se muestra como texto junto a la bandera.
+  img.alt = '';
 
   if (!flagCode) {
     img.onerror = null;
@@ -408,6 +420,7 @@ function renderIpSource() {
   if (!el) return;
   el.textContent = t('sourceDns');
   el.title = t('sourceDnsTitle');
+  el.setAttribute('aria-label', t('sourceDnsTitle'));
 }
 
 function getSslClass(daysLeft, status) {
@@ -557,10 +570,13 @@ function toggleWhoisDetails() {
 function handleExpandButtonClick(button) {
   const targetId = button.dataset.expand;
   const details = $(targetId);
-  if (details) {
-    details.hidden = !details.hidden;
-    button.classList.toggle('expanded', !details.hidden);
-  }
+  if (!details) return;
+  details.hidden = !details.hidden;
+  button.classList.toggle('expanded', !details.hidden);
+  // Mantener sincronizado aria-expanded del botón de valor asociado (ssl-toggle / whois-toggle),
+  // que también puede abrir/cerrar el mismo panel.
+  const toggle = $(targetId.replace('-details', '-toggle'));
+  if (toggle) toggle.setAttribute('aria-expanded', String(!details.hidden));
 }
 
 
@@ -607,6 +623,7 @@ function renderMap(data) {
   tiles.forEach((tile) => {
     const img = new Image();
     img.className = 'map-tile';
+    img.alt = '';
     img.draggable = false;
     img.style.left = `${tile.left}px`;
     img.style.top = `${tile.top}px`;

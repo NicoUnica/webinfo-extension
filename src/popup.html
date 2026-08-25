@@ -7,11 +7,11 @@
 <body>
   <div id="app">
     <span id="coords" hidden></span>
-    <div id="loading" class="loading">
+    <div id="loading" class="loading" role="status" data-i18n-aria="a11yLoading">
       <div class="spinner"></div>
     </div>
 
-    <div id="error" class="state-msg" style="display:none">
+    <div id="error" class="state-msg" role="alert" style="display:none">
       <div id="error-msg" class="error-text"></div>
       <button id="error-retry" class="error-retry" data-i18n="retry">Retry</button>
     </div>
@@ -75,7 +75,7 @@
           <div class="value-wrap">
             <button id="ssl-toggle" class="value-main ssl-value" type="button" aria-expanded="false"></button>
           </div>
-          <button class="expand-btn" type="button" data-expand="ssl-details">
+          <button class="expand-btn" type="button" data-expand="ssl-details" data-i18n-aria="a11yToggleSsl">
             <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
@@ -89,7 +89,7 @@
           <div class="value-wrap">
             <button id="whois-toggle" class="value-main whois-value" type="button" aria-expanded="false">--</button>
           </div>
-          <button class="expand-btn" type="button" data-expand="whois-details">
+          <button class="expand-btn" type="button" data-expand="whois-details" data-i18n-aria="a11yToggleWhois">
             <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
