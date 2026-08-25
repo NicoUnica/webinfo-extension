@@ -382,6 +382,24 @@ function setFlagStyle(style) {
   return normalized;
 }
 
+// Mostrar el favicon del sitio usando la API _favicon del propio navegador (permiso "favicon").
+// Se sirve desde el origen de la extensión, así que no filtramos el hostname a terceros y cumple el CSP.
+function setFavicon(pageUrl) {
+  const img = $('favicon');
+  if (!img) return;
+  if (!pageUrl) { img.hidden = true; return; }
+  try {
+    const url = new URL(chrome.runtime.getURL('/_favicon/'));
+    url.searchParams.set('pageUrl', pageUrl);
+    url.searchParams.set('size', '32');
+    img.onload = () => { img.hidden = false; };
+    img.onerror = () => { img.hidden = true; };
+    img.src = url.toString();
+  } catch {
+    img.hidden = true;
+  }
+}
+
 
 
 function setWhoisLink(id, value) {
@@ -730,6 +748,7 @@ async function init() {
   if (!tab || isSpecialPage(tab.url)) { showError(t('unsupportedPage')); return; }
 
   const hostname = new URL(tab.url).hostname;
+  setFavicon(tab.url);
   const settings = await chrome.storage.sync.get({ [FLAG_STYLE_KEY]: DEFAULT_FLAG_STYLE });
   const flagStyle = setFlagStyle(settings[FLAG_STYLE_KEY]);
 

@@ -386,6 +386,16 @@ body {
   text-decoration: none;
 }
 
+/* Favicon del sitio junto al dominio */
+.favicon {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  border-radius: 3px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 /* Foco visible para navegación por teclado (no afecta al clic de ratón). */
 a:focus-visible,
 button:focus-visible {

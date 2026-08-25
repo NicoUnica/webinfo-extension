@@ -8,7 +8,8 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "storage"
+    "storage",
+    "favicon"
   ],
   "host_permissions": [
     "<all_urls>"
