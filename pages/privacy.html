@@ -11,51 +11,110 @@
   .date { color: #888; font-size: 14px; margin-bottom: 30px; }
   p { margin: 10px 0; }
   ul { padding-left: 20px; }
+  .lang-toggle { display: flex; gap: 6px; justify-content: flex-end; margin-bottom: 16px; }
+  .lang-toggle button { font: inherit; font-size: 13px; padding: 5px 12px; border: 1px solid #ccc; background: #fff; color: #333; border-radius: 999px; cursor: pointer; }
+  .lang-toggle button.active { background: #007aff; border-color: #007aff; color: #fff; }
+  [data-lang-section][hidden] { display: none; }
 </style>
 </head>
 <body>
-<h1>WebInfo — Privacy Policy</h1>
-<div class="date">Last updated: August 20, 2026</div>
+<div class="lang-toggle" role="group" aria-label="Language / Idioma">
+  <button type="button" data-lang="en">English</button>
+  <button type="button" data-lang="es">Español</button>
+</div>
 
-<h2>Overview</h2>
-<p>WebInfo is a browser extension that shows the server country flag and IP geolocation of the websites you visit. It is designed to collect as little data as possible.</p>
+<section data-lang-section="en">
+  <h1>WebInfo — Privacy Policy</h1>
+  <div class="date">Last updated: August 20, 2026</div>
 
-<h2>Data we process</h2>
-<p>The extension processes only the following:</p>
-<ul>
-  <li><strong>Website hostname / server IP</strong>: The hostname (or resolved IP) of the site in your active tab is sent to the geolocation API to look up its server location — country, city, coordinates, ASN and ISP. This is the location of the <em>website's server</em>, not your own location.</li>
-</ul>
+  <h2>Overview</h2>
+  <p>WebInfo is a browser extension that shows the server country flag and IP geolocation of the websites you visit. It is designed to collect as little data as possible.</p>
 
-<h2>Data we do NOT collect</h2>
-<ul>
-  <li>Personal information (name, email, etc.)</li>
-  <li>Browsing history</li>
-  <li>User activity (clicks, scrolling, keystrokes)</li>
-  <li>Page content, form fields or cookies</li>
-  <li>Passwords or financial information</li>
-</ul>
+  <h2>Data we process</h2>
+  <p>The extension processes only the following:</p>
+  <ul>
+    <li><strong>Website hostname / server IP</strong>: The hostname (or resolved IP) of the site in your active tab is sent to the geolocation API to look up its server location — country, city, coordinates, ASN and ISP. This is the location of the <em>website's server</em>, not your own location.</li>
+  </ul>
 
-<h2>How data is used</h2>
-<p>Lookup results are only used to display information inside the extension. They are cached in the browser's session storage and cleared automatically when the browsing session ends. Nothing is stored on a permanent server on your behalf.</p>
+  <h2>Data we do NOT collect</h2>
+  <ul>
+    <li>Personal information (name, email, etc.)</li>
+    <li>Browsing history</li>
+    <li>User activity (clicks, scrolling, keystrokes)</li>
+    <li>Page content, form fields or cookies</li>
+    <li>Passwords or financial information</li>
+  </ul>
 
-<h2>Third-party services</h2>
-<p>To perform a lookup, the extension contacts the following services:</p>
-<ul>
-  <li><strong>ipwho.is</strong> — receives the hostname or server IP and returns geolocation details. It may forward the IP address to the geolocation provider <a href="https://ipapi.is">ipapi.is</a>. Only the IP address is forwarded — never your identity, page content or hostname beyond what is needed for the lookup.</li>
-  <li><strong>cloudflare-dns.com</strong> — used for DNS-over-HTTPS to resolve a hostname to an IPv4 address when needed.</li>
-  <li><strong>host.tools</strong> — receives the hostname to look up its SSL certificate details (issuer and validity dates).</li>
-  <li><strong>who-dat.as93.net</strong> — receives the hostname to look up its public WHOIS registration details (registrar, creation and expiry dates).</li>
-  <li><strong>basemaps.cartocdn.com</strong> (CARTO) — serves the map preview image tiles for the server's location.</li>
-</ul>
+  <h2>How data is used</h2>
+  <p>Lookup results are only used to display information inside the extension. They are cached in the browser's session storage and cleared automatically when the browsing session ends. Nothing is stored on a permanent server on your behalf.</p>
 
-<h2>Data attribution</h2>
-<p>Fallback geolocation databases are attributed as required by their licenses:</p>
-<ul>
-  <li><a href="https://db-ip.com">IP Geolocation by DB-IP</a> (DB-IP Lite, CC BY 4.0)</li>
-  <li><a href="https://www.maxmind.com">GeoLite data by MaxMind</a></li>
-</ul>
+  <h2>Third-party services</h2>
+  <p>To perform a lookup, the extension contacts the following services:</p>
+  <ul>
+    <li><strong>ipwho.is</strong> — receives the hostname or server IP and returns geolocation details. It may forward the IP address to the geolocation provider <a href="https://ipapi.is">ipapi.is</a>. Only the IP address is forwarded — never your identity, page content or hostname beyond what is needed for the lookup.</li>
+    <li><strong>cloudflare-dns.com</strong> — used for DNS-over-HTTPS to resolve a hostname to an IPv4 address when needed.</li>
+    <li><strong>host.tools</strong> — receives the hostname to look up its SSL certificate details (issuer and validity dates).</li>
+    <li><strong>who-dat.as93.net</strong> — receives the hostname to look up its public WHOIS registration details (registrar, creation and expiry dates).</li>
+    <li><strong>basemaps.cartocdn.com</strong> (CARTO) — serves the map preview image tiles for the server's location.</li>
+  </ul>
 
-<h2>Changes</h2>
-<p>This privacy policy may be updated from time to time. Any changes will be published on this page.</p>
+  <h2>Data attribution</h2>
+  <p>Fallback geolocation databases are attributed as required by their licenses:</p>
+  <ul>
+    <li><a href="https://db-ip.com">IP Geolocation by DB-IP</a> (DB-IP Lite, CC BY 4.0)</li>
+    <li><a href="https://www.maxmind.com">GeoLite data by MaxMind</a></li>
+  </ul>
+
+  <h2>Changes</h2>
+  <p>This privacy policy may be updated from time to time. Any changes will be published on this page.</p>
+</section>
+
+<section data-lang-section="es" hidden>
+  <h1>WebInfo — Política de privacidad</h1>
+  <div class="date">Última actualización: 20 de agosto de 2026</div>
+
+  <h2>Resumen</h2>
+  <p>WebInfo es una extensión de navegador que muestra la bandera del país del servidor y la geolocalización por IP de los sitios web que visitas. Está diseñada para recopilar la menor cantidad de datos posible.</p>
+
+  <h2>Datos que procesamos</h2>
+  <p>La extensión solo procesa lo siguiente:</p>
+  <ul>
+    <li><strong>Nombre de host del sitio / IP del servidor</strong>: el nombre de host (o la IP resuelta) del sitio en tu pestaña activa se envía a la API de geolocalización para consultar la ubicación de su servidor: país, ciudad, coordenadas, ASN e ISP. Esta es la ubicación del <em>servidor del sitio web</em>, no tu propia ubicación.</li>
+  </ul>
+
+  <h2>Datos que NO recopilamos</h2>
+  <ul>
+    <li>Información personal (nombre, correo electrónico, etc.)</li>
+    <li>Historial de navegación</li>
+    <li>Actividad del usuario (clics, desplazamiento, pulsaciones de teclas)</li>
+    <li>Contenido de la página, campos de formulario o cookies</li>
+    <li>Contraseñas o información financiera</li>
+  </ul>
+
+  <h2>Cómo se usan los datos</h2>
+  <p>Los resultados de las consultas solo se usan para mostrar información dentro de la extensión. Se almacenan temporalmente en el almacenamiento de sesión del navegador y se borran automáticamente cuando finaliza la sesión de navegación. No se guarda nada en un servidor permanente en tu nombre.</p>
+
+  <h2>Servicios de terceros</h2>
+  <p>Para realizar una consulta, la extensión contacta con los siguientes servicios:</p>
+  <ul>
+    <li><strong>ipwho.is</strong> — recibe el nombre de host o la IP del servidor y devuelve los detalles de geolocalización. Puede reenviar la dirección IP al proveedor de geolocalización <a href="https://ipapi.is">ipapi.is</a>. Solo se reenvía la dirección IP, nunca tu identidad, el contenido de la página ni el nombre de host más allá de lo necesario para la consulta.</li>
+    <li><strong>cloudflare-dns.com</strong> — se usa para DNS sobre HTTPS para resolver un nombre de host a una dirección IPv4 cuando es necesario.</li>
+    <li><strong>host.tools</strong> — recibe el nombre de host para consultar los detalles de su certificado SSL (emisor y fechas de validez).</li>
+    <li><strong>who-dat.as93.net</strong> — recibe el nombre de host para consultar sus datos públicos de registro WHOIS (registrador, fechas de creación y de expiración).</li>
+    <li><strong>basemaps.cartocdn.com</strong> (CARTO) — sirve las imágenes de los mosaicos del mapa de vista previa de la ubicación del servidor.</li>
+  </ul>
+
+  <h2>Atribución de datos</h2>
+  <p>Las bases de datos de geolocalización de respaldo se atribuyen según lo exigen sus licencias:</p>
+  <ul>
+    <li><a href="https://db-ip.com">IP Geolocation by DB-IP</a> (DB-IP Lite, CC BY 4.0)</li>
+    <li><a href="https://www.maxmind.com">GeoLite data by MaxMind</a></li>
+  </ul>
+
+  <h2>Cambios</h2>
+  <p>Esta política de privacidad puede actualizarse de vez en cuando. Cualquier cambio se publicará en esta página.</p>
+</section>
+
+<script src="privacy.js"></script>
 </body>
 </html>
