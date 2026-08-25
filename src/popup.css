@@ -199,43 +199,6 @@ body {
   white-space: nowrap;
 }
 
-/* Selector de idioma (EN / ES) */
-.lang-switch {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-  align-self: flex-start;
-  padding: 2px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.05);
-}
-
-@media (prefers-color-scheme: dark) {
-  .lang-switch { background: rgba(255, 255, 255, 0.08); }
-}
-
-.lang-btn {
-  border: 0;
-  background: transparent;
-  color: var(--text2);
-  font: inherit;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  padding: 3px 7px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
-}
-
-.lang-btn:hover { color: var(--text); }
-
-.lang-btn.active {
-  color: var(--accent);
-  background: var(--bg);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-}
-
 /* Mapa */
 .map-wrap {
   position: relative;
@@ -423,16 +386,6 @@ body {
   text-decoration: none;
 }
 
-/* Favicon del sitio junto al dominio */
-.favicon {
-  width: 14px;
-  height: 14px;
-  margin-right: 6px;
-  border-radius: 3px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
 /* Foco visible para navegación por teclado (no afecta al clic de ratón). */
 a:focus-visible,
 button:focus-visible {
@@ -440,44 +393,6 @@ button:focus-visible {
   outline-offset: 2px;
   border-radius: 4px;
 }
-
-/* Botón de copiar (IP / dominio / ASN) */
-.copy-btn {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 4px;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text2);
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
-}
-
-.copy-btn:hover {
-  color: var(--accent);
-  background: var(--badge-bg);
-}
-
-.copy-btn svg {
-  width: 12px;
-  height: 12px;
-}
-
-.copy-btn .icon-check { display: none; }
-
-.copy-btn.copied {
-  color: #34c759;
-  background: transparent;
-}
-
-.copy-btn.copied .icon-copy { display: none; }
-.copy-btn.copied .icon-check { display: inline; }
 
 .ssl-value {
   border: 0;

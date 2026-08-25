@@ -6,7 +6,6 @@ const TILE_HOST = 'https://{s}.basemaps.cartocdn.com';
 const TILE_ZOOM = 4; // Vista a nivel nacional, 2x2 tiles acercados a zoom 5 nivel ciudad
 const FLAG_STYLE_KEY = 'flagStyle';
 const DEFAULT_FLAG_STYLE = 'rect';
-const UI_LANG_KEY = 'uiLang';
 
 // Nombres cortos para las regiones que Intl.DisplayNames devuelve de forma verbosa
 // (p. ej. "RAE de Hong Kong (China)"). El resto de países se traducen con Intl.DisplayNames.
@@ -24,11 +23,6 @@ const I18N = {
     a11yLoading: 'Loading server information',
     a11yToggleSsl: 'Toggle SSL certificate details',
     a11yToggleWhois: 'Toggle WHOIS details',
-    a11yCopyIp: 'Copy IP address',
-    a11yCopyDomain: 'Copy domain',
-    a11yCopyAsn: 'Copy ASN',
-    copied: 'Copied',
-    a11yLanguage: 'Language',
 
     unsupportedPage: 'This page cannot be checked',
     resolveFailed: 'Unable to resolve server IP. Check your network and try again.',
@@ -54,11 +48,6 @@ const I18N = {
     a11yLoading: 'Cargando información del servidor',
     a11yToggleSsl: 'Mostrar u ocultar detalles del certificado SSL',
     a11yToggleWhois: 'Mostrar u ocultar detalles WHOIS',
-    a11yCopyIp: 'Copiar la dirección IP',
-    a11yCopyDomain: 'Copiar el dominio',
-    a11yCopyAsn: 'Copiar el ASN',
-    copied: 'Copiado',
-    a11yLanguage: 'Idioma',
 
     unsupportedPage: 'Esta página no puede ser verificada',
     resolveFailed: 'No se pudo resolver la IP del servidor. Verifica tu red e intenta de nuevo.',
@@ -87,10 +76,9 @@ function detectLocale() {
   if (!lang) lang = navigator.language || '';
   return /^es/i.test(lang) ? 'es' : 'en';
 }
-let LOCALE = detectLocale();
+const LOCALE = detectLocale();
 let currentMapCoords = null;
 let lastRenderData = null;
-let lastRenderCtx = null;
 let lastSslData = null;
 let lastWhoisData = null;
 
@@ -115,56 +103,6 @@ function applyStaticI18n() {
     const value = I18N[LOCALE][el.dataset.i18nAria] || I18N.en[el.dataset.i18nAria];
     if (value) el.setAttribute('aria-label', value);
   });
-}
-
-// Preferencia de idioma manual (chrome.storage.sync). Si existe, prevalece sobre la detección automática.
-async function loadStoredLocale() {
-  try {
-    const { [UI_LANG_KEY]: stored } = await chrome.storage.sync.get(UI_LANG_KEY);
-    if (stored === 'en' || stored === 'es') LOCALE = stored;
-  } catch { /* storage no disponible: usar el idioma detectado */ }
-}
-
-function applyLanguageSelectorState() {
-  document.querySelectorAll('[data-lang]').forEach((btn) => {
-    const active = btn.dataset.lang === LOCALE;
-    btn.classList.toggle('active', active);
-    btn.setAttribute('aria-pressed', String(active));
-  });
-}
-
-// Cambiar el idioma manualmente: persistir, reconstruir textos estáticos y re-pintar lo dinámico.
-async function setLocale(lang) {
-  if ((lang !== 'en' && lang !== 'es') || lang === LOCALE) return;
-  LOCALE = lang;
-  _regionNames = undefined; // rehacer Intl.DisplayNames para el nuevo idioma
-  try { await chrome.storage.sync.set({ [UI_LANG_KEY]: lang }); } catch { /* ignorar */ }
-  refreshLocaleText();
-}
-
-// Re-aplica solo el texto dependiente del idioma, sin recargar el mapa ni cerrar los paneles abiertos.
-function refreshLocaleText() {
-  applyStaticI18n();
-  applyLanguageSelectorState();
-  if (lastRenderCtx) {
-    const { data, hostname } = lastRenderCtx;
-    const flagCode = getFlagCode(data) || getFallbackFlagCode(hostname);
-    setText('country', getDisplayName(data, flagCode));
-    setText('city-region', [data.city, data.province].filter(Boolean).join(t('locationSeparator')) || '--');
-    setText('timezone', formatTimeZone(data.timezone));
-    renderIpSource();
-  }
-  renderSsl(lastSslData);
-  renderWhois(lastWhoisData);
-}
-
-function bindLanguageSelector() {
-  document.querySelectorAll('[data-lang]').forEach((btn) => {
-    if (btn._bound) return;
-    btn.addEventListener('click', () => setLocale(btn.dataset.lang));
-    btn._bound = true;
-  });
-  applyLanguageSelectorState();
 }
 
 function setText(id, value) {
@@ -450,26 +388,6 @@ function setFlagStyle(style) {
   return normalized;
 }
 
-// Mostrar el favicon del sitio usando la API _favicon del propio navegador (permiso "favicon").
-// Se sirve desde el origen de la extensión, así que no filtramos el hostname a terceros y cumple el CSP.
-function setFavicon(pageUrl) {
-  const img = $('favicon');
-  if (!img) return;
-  if (!pageUrl) { img.hidden = true; return; }
-  try {
-    const url = new URL(chrome.runtime.getURL('/_favicon/'));
-    url.searchParams.set('pageUrl', pageUrl);
-    url.searchParams.set('size', '32');
-    img.onload = () => { img.hidden = false; };
-    img.onerror = () => { img.hidden = true; };
-    img.src = url.toString();
-  } catch {
-    img.hidden = true;
-  }
-}
-
-
-
 function setWhoisLink(id, value) {
   const el = $(id);
   if (!el) return;
@@ -482,30 +400,7 @@ function setWhoisLink(id, value) {
     el.removeAttribute('href');
     el.classList.add('disabled');
   }
-  // El botón de copiar solo aparece cuando hay un valor real que copiar.
-  const copyBtn = $(`copy-${id}`);
-  if (copyBtn) {
-    copyBtn.hidden = !value;
-    copyBtn.classList.remove('copied');
-  }
 }
-
-// Copiar al portapapeles el texto del valor asociado, con confirmación visual breve.
-async function copyValue(btn) {
-  const target = $(btn.dataset.copy);
-  const text = target?.textContent?.trim();
-  if (!text || text === '--') return;
-  try {
-    await navigator.clipboard.writeText(text);
-    btn.classList.add('copied');
-    btn.title = t('copied');
-    setTimeout(() => btn.classList.remove('copied'), 1200);
-  } catch {
-    /* portapapeles no disponible */
-  }
-}
-
-
 
 function formatDateTime(value) {
   if (!value) return '--';
@@ -715,12 +610,6 @@ function bindActions() {
     button.addEventListener('click', () => handleExpandButtonClick(button));
     button._bound = true;
   });
-
-  document.querySelectorAll('[data-copy]').forEach((button) => {
-    if (button._bound) return;
-    button.addEventListener('click', () => copyValue(button));
-    button._bound = true;
-  });
 }
 
 function renderMap(data) {
@@ -772,7 +661,6 @@ function resetDetailPanels() {
 
 function render(data, hostname, flagStyle) {
   lastRenderData = data;
-  lastRenderCtx = { data, hostname, flagStyle };
   $('loading').style.display = 'none';
   $('content').style.display = 'block';
   resetDetailPanels();
@@ -818,7 +706,6 @@ async function init() {
   if (!tab || isSpecialPage(tab.url)) { showError(t('unsupportedPage')); return; }
 
   const hostname = new URL(tab.url).hostname;
-  setFavicon(tab.url);
   const settings = await chrome.storage.sync.get({ [FLAG_STYLE_KEY]: DEFAULT_FLAG_STYLE });
   const flagStyle = setFlagStyle(settings[FLAG_STYLE_KEY]);
 
@@ -880,13 +767,11 @@ function bindSystemThemeListener() {
   else mq.addListener(onChange);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadStoredLocale();
+document.addEventListener('DOMContentLoaded', () => {
   applyStaticI18n();
   bindRetry();
   bindMapContextMenu();
   bindActions();
-  bindLanguageSelector();
   bindSystemThemeListener();
   init();
 });
