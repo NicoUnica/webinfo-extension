@@ -200,8 +200,21 @@ function normalizeData(raw, ip) {
   };
 }
 
+// Envuelve fetch con un límite de tiempo (AbortController): si un servicio externo no responde,
+// se aborta en vez de dejar el popup cargando indefinidamente. Los llamadores ya tratan el fallo.
+const FETCH_TIMEOUT_MS = 8000;
+async function fetchWithTimeout(resource, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), options.timeout ?? FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(resource, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchGeoJson(ip) {
-  const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`);
+  const res = await fetchWithTimeout(`https://ipwho.is/${encodeURIComponent(ip)}`);
   if (!res.ok) return null;
   const raw = await res.json();
   return raw.success ? raw : null;
@@ -215,7 +228,7 @@ async function fetchDomainJson(hostname) {
 }
 
 async function fetchSslJson(hostname) {
-  const res = await fetch(`https://host.tools/api/v1/ssl/cert?q=${encodeURIComponent(hostname)}`);
+  const res = await fetchWithTimeout(`https://host.tools/api/v1/ssl/cert?q=${encodeURIComponent(hostname)}`);
   if (!res.ok) return null;
   const raw = await res.json();
   if (!raw?.data || typeof raw.data !== 'object') return null;
@@ -231,7 +244,7 @@ async function fetchSslJson(hostname) {
 }
 
 async function fetchWhoisJson(hostname) {
-  const res = await fetch(`https://who-dat.as93.net/${encodeURIComponent(hostname)}`);
+  const res = await fetchWithTimeout(`https://who-dat.as93.net/${encodeURIComponent(hostname)}`);
   if (!res.ok) return null;
   const raw = await res.json();
   if (!raw || typeof raw !== 'object') return null;
@@ -289,7 +302,7 @@ function isIPv4(ip) {
 // Usar Cloudflare DoH público para resolver hostname → IPv4 (solo registros A)
 async function resolveIpDoH(hostname) {
   try {
-    const r = await fetch(
+    const r = await fetchWithTimeout(
       `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(hostname)}&type=A`,
       { headers: { 'Accept': 'application/dns-json' } }
     );
