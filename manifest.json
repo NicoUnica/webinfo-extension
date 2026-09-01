@@ -7,12 +7,14 @@
   "default_locale": "en",
   "permissions": [
     "activeTab",
-    "tabs",
-    "storage",
-    "favicon"
+    "storage"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "https://ipwho.is/*",
+    "https://host.tools/*",
+    "https://who-dat.as93.net/*",
+    "https://cloudflare-dns.com/*",
+    "https://*.basemaps.cartocdn.com/*"
   ],
   "action": {
     "default_popup": "src/popup.html",
