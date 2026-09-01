@@ -158,13 +158,6 @@ async function fetchGeoJson(ip) {
   return raw.success ? raw : null;
 }
 
-async function fetchDomainJson(hostname) {
-  // ipwho.is no soporta dominios, siempre resolvemos DNS primero
-  const ip = await resolveIpDoH(hostname);
-  if (!ip) return null;
-  return await fetchGeoJson(ip);
-}
-
 async function fetchSslJson(hostname) {
   const res = await fetchWithTimeout(`https://host.tools/api/v1/ssl/cert?q=${encodeURIComponent(hostname)}`);
   if (!res.ok) return null;
@@ -234,31 +227,49 @@ function extractAsn(asString) {
 }
 
 function isIPv4(ip) {
-  return typeof ip === 'string' && /^\d{1,3}(\.\d{1,3}){3}$/.test(ip);
+  return typeof ip === 'string'
+    && ip.split('.').length === 4
+    && ip.split('.').every((part) => /^\d+$/.test(part) && Number(part) <= 255);
 }
 
-// Usar Cloudflare DoH público para resolver hostname → IPv4 (solo registros A)
-async function resolveIpDoH(hostname) {
+function isIPv6(ip) {
+  // Las direcciones provienen de DoH o de URL.hostname; basta una validación estricta de
+  // caracteres para no aceptar valores arbitrarios desde la caché de sesión.
+  return typeof ip === 'string' && ip.includes(':') && /^[0-9a-f:]+$/i.test(ip);
+}
+
+function isIpAddress(ip) {
+  return isIPv4(ip) || isIPv6(ip);
+}
+
+// Usar Cloudflare DoH público para resolver hostname → IP. Se prefiere IPv4 por compatibilidad,
+// pero se consulta AAAA si no existe un registro A para que funcionen hosts solo IPv6.
+async function resolveDnsRecord(hostname, type, answerType) {
   try {
     const r = await fetchWithTimeout(
-      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(hostname)}&type=A`,
+      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(hostname)}&type=${type}`,
       { headers: { 'Accept': 'application/dns-json' } }
     );
     if (!r.ok) return null;
     const data = await r.json();
-    const a = data.Answer?.find(x => x.type === 1);
-    return a?.data || null;
+    const answer = data.Answer?.find((entry) => entry.type === answerType);
+    return isIpAddress(answer?.data) ? answer.data : null;
   } catch {
     return null;
   }
 }
 
-// Resolver hostname → IPv4 vía DNS-over-HTTPS. El resultado se cachea en la sesión para
+async function resolveIpDoH(hostname) {
+  return await resolveDnsRecord(hostname, 'A', 1)
+    || await resolveDnsRecord(hostname, 'AAAA', 28);
+}
+
+// Resolver hostname → IP vía DNS-over-HTTPS. El resultado se cachea en la sesión para
 // evitar repetir la consulta DoH al reabrir el popup en el mismo host.
 async function resolveHostIp(hostname) {
   const key = `ip_${hostname}`;
   const cached = (await chrome.storage.session.get(key))[key];
-  if (cached && isIPv4(cached)) return cached;
+  if (isIpAddress(cached)) return cached;
 
   const v4 = await resolveIpDoH(hostname);
   if (v4) {
@@ -582,6 +593,8 @@ function handleExpandButtonClick(button) {
   const targetId = button.dataset.expand;
   const details = $(targetId);
   if (!details) return;
+  if ((targetId === 'ssl-details' && !lastSslData)
+    || (targetId === 'whois-details' && !lastWhoisData)) return;
   details.hidden = !details.hidden;
   button.classList.toggle('expanded', !details.hidden);
   // Mantener sincronizado aria-expanded del botón de valor asociado (ssl-toggle / whois-toggle),
@@ -702,51 +715,30 @@ function bindRetry() {
 }
 
 async function init() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab || isSpecialPage(tab.url)) { showError(t('unsupportedPage')); return; }
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab || isSpecialPage(tab.url)) { showError(t('unsupportedPage')); return; }
 
-  const hostname = new URL(tab.url).hostname;
-  const settings = await chrome.storage.sync.get({ [FLAG_STYLE_KEY]: DEFAULT_FLAG_STYLE });
-  const flagStyle = setFlagStyle(settings[FLAG_STYLE_KEY]);
+    const hostname = new URL(tab.url).hostname.replace(/^\[|\]$/g, '');
+    const settings = await chrome.storage.sync.get({ [FLAG_STYLE_KEY]: DEFAULT_FLAG_STYLE });
+    const flagStyle = setFlagStyle(settings[FLAG_STYLE_KEY]);
 
-  // SSL y WHOIS solo dependen del hostname: se lanzan ya, en paralelo con la resolución de
-  // geolocalización, y cada uno se pinta al llegar (o queda en '--' si su servicio falla).
-  resetDetailPanels();
-  loadSslInfo(hostname);
-  loadWhoisInfo(hostname);
+    // SSL y WHOIS solo dependen del hostname: se lanzan ya, en paralelo con la geolocalización.
+    resetDetailPanels();
+    loadSslInfo(hostname);
+    loadWhoisInfo(hostname);
 
-  // Resolver la IPv4 del host vía DNS-over-HTTPS (con cache de sesión).
-  const ip = await resolveHostIp(hostname);
+    const ip = isIpAddress(hostname) ? hostname : await resolveHostIp(hostname);
+    if (!ip) { showError(t('resolveFailed')); return; }
 
-  if (!ip) {
-    // Si la resolución DoH falla, dejar que la API intente resolver por dominio directamente.
-    try {
-      const raw = await fetchDomainJson(hostname);
-      if (!raw) throw new Error('domain lookup failed');
-      const data = normalizeData(raw, raw.ip);
-
-      // Cachear bajo la IP resuelta (misma clave que lee la ruta principal), no bajo el hostname.
-      if (data.ip) {
-        await chrome.storage.session.set({ [`geo_${data.ip}`]: { data, ts: Date.now() } });
-      }
-      render(data, hostname, flagStyle);
-      return;
-    } catch {
-      showError(t('resolveFailed'));
+    // Buscar cache geo (usando IP como key, reutilizable cuando múltiples dominios comparten IP CDN).
+    const key = `geo_${ip}`;
+    const store = await chrome.storage.session.get(key);
+    if (store[key] && Date.now() - store[key].ts < CACHE_TTL) {
+      render(store[key].data, hostname, flagStyle);
       return;
     }
-  }
 
-  // Buscar cache geo (usando IP como key, reutilizable cuando múltiples dominios comparten IP CDN)
-  const key = `geo_${ip}`;
-  const store = await chrome.storage.session.get(key);
-  if (store[key] && Date.now() - store[key].ts < CACHE_TTL) {
-    render(store[key].data, hostname, flagStyle);
-    return;
-  }
-
-  // Llamar a API de geolocalización
-  try {
     const raw = await fetchGeoJson(ip);
     if (!raw) throw new Error('API error');
     const data = normalizeData(raw, ip);
