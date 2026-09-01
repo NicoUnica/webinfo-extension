@@ -496,7 +496,7 @@ async function loadWhoisInfo(hostname) {
 }
 
 function renderWhois(data) {
-  lastWhoisData = data;
+  lastWhoisData = data?.registrar ? data : null;
   const button = $('whois-toggle');
   if (!button) return;
   
@@ -580,7 +580,7 @@ function toggleWhoisDetails() {
   const details = $('whois-details');
   const button = $('whois-toggle');
   const expandBtn = document.querySelector('[data-expand="whois-details"]');
-  if (!details || !button) return;
+  if (!details || !button || !lastWhoisData) return;
   const isHidden = details.hidden;
   details.hidden = !isHidden;
   button.setAttribute('aria-expanded', String(isHidden));
