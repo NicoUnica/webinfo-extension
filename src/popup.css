@@ -283,6 +283,28 @@ body {
   animation: pulse 3s ease-in-out infinite;
 }
 
+.map-attribution {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  z-index: 4;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .map-attribution {
+    color: #f5f5f7;
+    background: rgba(28, 28, 30, 0.82);
+  }
+}
+
 @keyframes pulse {
   0% {
     transform: translate(-50%, -50%) scale(1);
