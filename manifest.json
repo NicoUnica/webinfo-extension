@@ -14,7 +14,7 @@
     "https://host.tools/*",
     "https://who-dat.as93.net/*",
     "https://cloudflare-dns.com/*",
-    "https://*.basemaps.cartocdn.com/*"
+    "https://tile.openstreetmap.org/*"
   ],
   "action": {
     "default_popup": "src/popup.html",
@@ -32,6 +32,6 @@
     "128": "assets/icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://ipwho.is https://host.tools https://who-dat.as93.net https://cloudflare-dns.com; img-src 'self' https://*.basemaps.cartocdn.com data:; style-src 'self' 'unsafe-inline'"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://ipwho.is https://host.tools https://who-dat.as93.net https://cloudflare-dns.com; img-src 'self' https://tile.openstreetmap.org data:; style-src 'self' 'unsafe-inline'"
   }
 }

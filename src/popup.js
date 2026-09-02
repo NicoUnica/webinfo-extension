@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const CACHE_TTL = 10 * 60 * 1000;
 const SSL_CACHE_TTL = 6 * 60 * 60 * 1000;
 const WHOIS_CACHE_TTL = 24 * 60 * 60 * 1000;
-const TILE_HOST = 'https://{s}.basemaps.cartocdn.com';
+const TILE_HOST = 'https://tile.openstreetmap.org';
 const TILE_ZOOM = 4; // Vista a nivel nacional, 2x2 tiles acercados a zoom 5 nivel ciudad
 const FLAG_STYLE_KEY = 'flagStyle';
 const DEFAULT_FLAG_STYLE = 'rect';
@@ -78,7 +78,6 @@ function detectLocale() {
 }
 const LOCALE = detectLocale();
 let currentMapCoords = null;
-let lastRenderData = null;
 let lastSslData = null;
 let lastWhoisData = null;
 
@@ -287,13 +286,7 @@ function latToWorldY(lat, z) {
   return ((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * Math.pow(2, z) * 256;
 }
 
-// El tile style sigue el esquema de color del sistema para que el mapa combine con el tema del popup.
-function getMapStyle() {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark_all' : 'light_all';
-}
-
 function getMapTiles(lat, lon, width, height) {
-  const style = getMapStyle();
   const worldX = lonToWorldX(lon, TILE_ZOOM);
   const worldY = latToWorldY(lat, TILE_ZOOM);
   const centerTileX = Math.floor(worldX / 256);
@@ -304,15 +297,13 @@ function getMapTiles(lat, lon, width, height) {
   const offsetY = Math.round(height / 2 - (worldY - startY * 256));
   const tiles = [];
   const maxTile = Math.pow(2, TILE_ZOOM);
-  const subdomains = ['a', 'b', 'c', 'd'];
 
   for (let dy = 0; dy < 3; dy++) {
     for (let dx = 0; dx < 3; dx++) {
       const x = (startX + dx + maxTile) % maxTile;
       const y = startY + dy;
       if (y < 0 || y >= maxTile) continue;
-      const subdomain = subdomains[(dx + dy) % subdomains.length];
-      const url = `${TILE_HOST.replace('{s}', subdomain)}/${style}/${TILE_ZOOM}/${x}/${y}.png`;
+      const url = `${TILE_HOST}/${TILE_ZOOM}/${x}/${y}.png`;
       tiles.push({
         url,
         left: offsetX + dx * 256,
@@ -649,6 +640,7 @@ function renderMap(data) {
     img.className = 'map-tile';
     img.alt = '';
     img.draggable = false;
+    img.referrerPolicy = 'strict-origin-when-cross-origin';
     img.style.left = `${tile.left}px`;
     img.style.top = `${tile.top}px`;
     img.onload = img.onerror = () => {
@@ -673,7 +665,6 @@ function resetDetailPanels() {
 }
 
 function render(data, hostname, flagStyle) {
-  lastRenderData = data;
   $('loading').style.display = 'none';
   $('content').style.display = 'block';
   resetDetailPanels();
@@ -750,20 +741,10 @@ async function init() {
   }
 }
 
-function bindSystemThemeListener() {
-  const mq = window.matchMedia('(prefers-color-scheme: dark)');
-  const onChange = () => {
-    if (lastRenderData) renderMap(lastRenderData);
-  };
-  if (mq.addEventListener) mq.addEventListener('change', onChange);
-  else mq.addListener(onChange);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   applyStaticI18n();
   bindRetry();
   bindMapContextMenu();
   bindActions();
-  bindSystemThemeListener();
   init();
 });
