@@ -35,4 +35,5 @@ Para obtener los datos del servidor, WebInfo consulta servicios de geolocalizaci
 
 Los resultados se guardan temporalmente durante la sesión del navegador. Consulta la [política de privacidad](pages/privacy.html) para ver el detalle de los servicios utilizados.
 
-<img width="314" height="472" alt="Captura de pantalla de WebInfo" src="https://github.com/user-attachments/assets/0ac5aa33-5338-4b61-9d91-3b7b38894e30" />
+<img width="318" height="471" alt="image" src="https://github.com/user-attachments/assets/2f9e320b-9c7f-47ac-be29-467202132a41" />
+
