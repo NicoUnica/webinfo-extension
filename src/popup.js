@@ -345,13 +345,13 @@ function getDisplayName(data, flagCode) {
 function setFlagImage(flagCode) {
   const img = $('flag-img');
   if (!img) return;
-  img.style.display = 'block';
   // El nombre del país ya acompaña la bandera.
   img.alt = '';
 
   if (!flagCode) {
     img.onerror = null;
-    img.src = chrome.runtime.getURL('../assets/icons/icon48.png');
+    img.removeAttribute('src');
+    img.style.display = 'none';
     return;
   }
 
@@ -359,8 +359,10 @@ function setFlagImage(flagCode) {
   const localSvgSrc = chrome.runtime.getURL(style === 'square' ? `../assets/flags/1x1/${flagCode}.png` : `../assets/flags/4x3/${flagCode}.svg`);
   img.onerror = () => {
     img.onerror = null;
-    img.src = chrome.runtime.getURL('../assets/icons/icon48.png');
+    img.removeAttribute('src');
+    img.style.display = 'none';
   };
+  img.style.display = 'block';
   img.src = localSvgSrc;
 }
 
