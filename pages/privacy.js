@@ -1,4 +1,3 @@
-// Página de privacidad bilingüe: elige el idioma según el navegador y permite cambiarlo a mano.
 (function () {
   const TITLES = { en: 'WebInfo — Privacy Policy', es: 'WebInfo — Política de privacidad' };
   const sections = document.querySelectorAll('[data-lang-section]');

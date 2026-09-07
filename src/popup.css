@@ -16,7 +16,6 @@
   --pin-ring: #ffffff;
 }
 
-/* Paleta de modo oscuro: los bloques dark de más abajo (mapa, lista, overlay) asumen este fondo oscuro. */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1c1c1e;
@@ -50,7 +49,6 @@ body {
   overflow: hidden;
 }
 
-/* Scrollbar personalizado */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -87,7 +85,6 @@ body {
   overflow: hidden;
 }
 
-/* Carga / Error */
 .loading,
 .state-msg {
   background: transparent;
@@ -137,7 +134,6 @@ body {
   transform: scale(1.02);
 }
 
-/* Encabezado */
 .header {
   display: flex;
   align-items: center;
@@ -199,7 +195,6 @@ body {
   white-space: nowrap;
 }
 
-/* Mapa */
 .map-wrap {
   position: relative;
   overflow: hidden;
@@ -332,7 +327,6 @@ body {
   .map-loading { background: rgba(0, 0, 0, 0.45); }
 }
 
-/* Lista de información */
 .info-list {
   display: flex;
   flex-direction: column;
@@ -408,7 +402,6 @@ body {
   text-decoration: none;
 }
 
-/* Foco visible para navegación por teclado (no afecta al clic de ratón). */
 a:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--accent);

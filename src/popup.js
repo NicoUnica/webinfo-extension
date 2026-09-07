@@ -3,12 +3,11 @@ const CACHE_TTL = 10 * 60 * 1000;
 const SSL_CACHE_TTL = 6 * 60 * 60 * 1000;
 const WHOIS_CACHE_TTL = 24 * 60 * 60 * 1000;
 const TILE_HOST = 'https://tile.openstreetmap.org';
-const TILE_ZOOM = 4; // Vista a nivel nacional, 2x2 tiles acercados a zoom 5 nivel ciudad
+const TILE_ZOOM = 4;
 const FLAG_STYLE_KEY = 'flagStyle';
 const DEFAULT_FLAG_STYLE = 'rect';
 
-// Nombres cortos para las regiones que Intl.DisplayNames devuelve de forma verbosa
-// (p. ej. "RAE de Hong Kong (China)"). El resto de países se traducen con Intl.DisplayNames.
+// Acorta nombres de regiones especiales.
 const REGION_SHORT_NAMES = {
   es: { hk: 'Hong Kong', mo: 'Macau', tw: 'Taiwán' },
   en: { hk: 'Hong Kong', mo: 'Macau', tw: 'Taiwan' },
@@ -67,12 +66,9 @@ const I18N = {
   },
 };
 
-// Idioma del popup: usamos el mismo idioma que la interfaz de la extensión (el nombre y la
-// descripción del manifest vienen de _locales según el idioma del navegador). Así TODO el popup
-// queda en un único idioma —inglés o español— elegido por el navegador del usuario, sin mezclas.
 function detectLocale() {
   let lang = '';
-  try { lang = chrome.i18n.getUILanguage() || ''; } catch { /* chrome.i18n no disponible */ }
+  try { lang = chrome.i18n.getUILanguage() || ''; } catch {}
   if (!lang) lang = navigator.language || '';
   return /^es/i.test(lang) ? 'es' : 'en';
 }
@@ -85,19 +81,16 @@ function t(key) {
   return I18N[LOCALE][key] || I18N.en[key] || key;
 }
 
-// Etiqueta BCP-47 para las APIs Intl según el idioma activo del popup.
 function localeTag() {
   return LOCALE === 'es' ? 'es-ES' : 'en-US';
 }
 
-// Localizar las etiquetas estáticas marcadas con data-i18n según el idioma del navegador.
 function applyStaticI18n() {
   document.documentElement.lang = LOCALE;
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const value = I18N[LOCALE][el.dataset.i18n] || I18N.en[el.dataset.i18n];
     if (value) el.textContent = value;
   });
-  // aria-label localizado para controles sin texto visible (spinner, chevrons de expandir).
   document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
     const value = I18N[LOCALE][el.dataset.i18nAria] || I18N.en[el.dataset.i18nAria];
     if (value) el.setAttribute('aria-label', value);
@@ -117,7 +110,6 @@ function isSpecialPage(url) {
   return !url || /^(chrome|chrome-extension|edge|about|file|devtools|browser):/.test(url);
 }
 
-// Normalizar campos de la API ipwho.is al schema interno del popup.
 function normalizeData(raw, ip) {
   const asn = raw.connection?.asn ? String(raw.connection.asn) : '';
   return {
@@ -137,8 +129,7 @@ function normalizeData(raw, ip) {
   };
 }
 
-// Envuelve fetch con un límite de tiempo (AbortController): si un servicio externo no responde,
-// se aborta en vez de dejar el popup cargando indefinidamente. Los llamadores ya tratan el fallo.
+// Evita que el popup quede cargando indefinidamente.
 const FETCH_TIMEOUT_MS = 8000;
 async function fetchWithTimeout(resource, options = {}) {
   const controller = new AbortController();
@@ -216,9 +207,6 @@ async function fetchWhoisInfo(hostname) {
   return data;
 }
 
-// Extraer número ASN del campo ASN
-// "AS37963 Hangzhou Alibaba Advertising Co.,Ltd." → "AS37963"
-// "AS15169" → "AS15169"
 function extractAsn(asString) {
   if (!asString) return '--';
   const m = asString.match(/^(AS\s*\d+)/i);
@@ -232,8 +220,7 @@ function isIPv4(ip) {
 }
 
 function isIPv6(ip) {
-  // Las direcciones provienen de DoH o de URL.hostname; basta una validación estricta de
-  // caracteres para no aceptar valores arbitrarios desde la caché de sesión.
+  // Limita los valores de DoH y caché a caracteres IPv6.
   return typeof ip === 'string' && ip.includes(':') && /^[0-9a-f:]+$/i.test(ip);
 }
 
@@ -241,8 +228,7 @@ function isIpAddress(ip) {
   return isIPv4(ip) || isIPv6(ip);
 }
 
-// Usar Cloudflare DoH público para resolver hostname → IP. Se prefiere IPv4 por compatibilidad,
-// pero se consulta AAAA si no existe un registro A para que funcionen hosts solo IPv6.
+// Prioriza IPv4 y usa IPv6 como alternativa.
 async function resolveDnsRecord(hostname, type, answerType) {
   try {
     const r = await fetchWithTimeout(
@@ -263,8 +249,6 @@ async function resolveIpDoH(hostname) {
     || await resolveDnsRecord(hostname, 'AAAA', 28);
 }
 
-// Resolver hostname → IP vía DNS-over-HTTPS. El resultado se cachea en la sesión para
-// evitar repetir la consulta DoH al reabrir el popup en el mismo host.
 async function resolveHostIp(hostname) {
   const key = `ip_${hostname}`;
   const cached = (await chrome.storage.session.get(key))[key];
@@ -278,6 +262,7 @@ async function resolveHostIp(hostname) {
   return null;
 }
 
+// Convierte coordenadas a píxeles Web Mercator.
 function lonToWorldX(lon, z) {
   return ((lon + 180) / 360) * Math.pow(2, z) * 256;
 }
@@ -314,6 +299,7 @@ function getMapTiles(lat, lon, width, height) {
   return tiles;
 }
 
+// Distingue territorios con bandera propia.
 function getFlagCode(data) {
   const code = (data.country_code || '').toUpperCase();
   if (code === 'CN') {
@@ -330,8 +316,6 @@ function getFallbackFlagCode(hostname) {
   return '';
 }
 
-// Traducir códigos ISO de país (US, BR, IT, ...) al idioma activo con la API nativa del navegador,
-// que cubre todos los países. Memoizado; si Intl.DisplayNames no existe, devuelve '' y se usa el fallback.
 let _regionNames;
 function localizeCountry(countryCode) {
   const cc = (countryCode || '').toUpperCase();
@@ -347,7 +331,7 @@ function localizeCountry(countryCode) {
     try {
       const name = _regionNames.of(cc);
       if (name && name.toUpperCase() !== cc) return name;
-    } catch { /* código de región no válido */ }
+    } catch {}
   }
   return '';
 }
@@ -362,7 +346,7 @@ function setFlagImage(flagCode) {
   const img = $('flag-img');
   if (!img) return;
   img.style.display = 'block';
-  // Decorativa: el nombre del país se muestra como texto junto a la bandera.
+  // El nombre del país ya acompaña la bandera.
   img.alt = '';
 
   if (!flagCode) {
@@ -408,11 +392,9 @@ function formatDateTime(value) {
   if (!value) return '--';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  // "medium" da una fecha legible e idiomática por idioma: "Aug 20, 2026" / "20 ago 2026".
   return date.toLocaleDateString(localeTag(), { dateStyle: 'medium' });
 }
 
-// Mostrar la zona horaria IANA junto a su desfase UTC actual, p. ej. "America/New_York (GMT-4)".
 function formatTimeZone(tz) {
   if (!tz) return '--';
   try {
@@ -588,14 +570,13 @@ function handleExpandButtonClick(button) {
     || (targetId === 'whois-details' && !lastWhoisData)) return;
   details.hidden = !details.hidden;
   button.classList.toggle('expanded', !details.hidden);
-  // Mantener sincronizado aria-expanded del botón de valor asociado (ssl-toggle / whois-toggle),
-  // que también puede abrir/cerrar el mismo panel.
   const toggle = $(targetId.replace('-details', '-toggle'));
   if (toggle) toggle.setAttribute('aria-expanded', String(!details.hidden));
 }
 
 
 
+// Evita registrar los mismos eventos dos veces.
 function bindActions() {
   const sslToggle = $('ssl-toggle');
   if (sslToggle && !sslToggle._bound) {
@@ -619,7 +600,7 @@ function bindActions() {
 function renderMap(data) {
   const lat = parseFloat(data.latitude);
   const lon = parseFloat(data.longitude);
-  // Number.isFinite descarta null/undefined/NaN sin tratar el 0 válido (Greenwich, ecuador) como ausente.
+  // 0 también es una coordenada válida.
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     currentMapCoords = null;
     $('map-container').style.display = 'none';
@@ -714,7 +695,7 @@ async function init() {
     const settings = await chrome.storage.sync.get({ [FLAG_STYLE_KEY]: DEFAULT_FLAG_STYLE });
     const flagStyle = setFlagStyle(settings[FLAG_STYLE_KEY]);
 
-    // SSL y WHOIS solo dependen del hostname: se lanzan ya, en paralelo con la geolocalización.
+    // SSL y WHOIS se cargan mientras se obtiene la ubicación.
     resetDetailPanels();
     loadSslInfo(hostname);
     loadWhoisInfo(hostname);
@@ -722,7 +703,7 @@ async function init() {
     const ip = isIpAddress(hostname) ? hostname : await resolveHostIp(hostname);
     if (!ip) { showError(t('resolveFailed')); return; }
 
-    // Buscar cache geo (usando IP como key, reutilizable cuando múltiples dominios comparten IP CDN).
+    // La caché por IP se comparte entre dominios.
     const key = `geo_${ip}`;
     const store = await chrome.storage.session.get(key);
     if (store[key] && Date.now() - store[key].ts < CACHE_TTL) {
