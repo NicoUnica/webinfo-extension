@@ -13,6 +13,7 @@ Extensión de Chrome para consultar de un vistazo dónde está alojado el servid
 - Mapa interactivo con acceso directo a Google Maps
 - Resolución DNS compatible con IPv4 e IPv6
 - Interfaz disponible en inglés y español
+- Acceso al mapa mediante botón o clic derecho
 
 ## Uso
 
@@ -23,6 +24,8 @@ Extensión de Chrome para consultar de un vistazo dónde está alojado el servid
 La extensión funciona sobre la pestaña activa y no analiza el contenido de las páginas.
 
 ## Instalación
+
+Requiere Chrome 102 o posterior.
 
 1. Abrir `chrome://extensions`
 2. Activar **Modo desarrollador**
@@ -35,5 +38,10 @@ Para obtener los datos del servidor, WebInfo consulta servicios de geolocalizaci
 
 Los resultados se guardan temporalmente durante la sesión del navegador. Consulta la [política de privacidad](pages/privacy.html) para ver el detalle de los servicios utilizados.
 
+## Tipografía
+
+Afacad se incluye localmente desde [Google Fonts](https://github.com/google/fonts/tree/main/ofl/afacad), bajo la licencia [SIL Open Font License](assets/fonts/OFL.txt).
+
 <img width="318" height="471" alt="image" src="https://github.com/user-attachments/assets/2f9e320b-9c7f-47ac-be29-467202132a41" />
+
 
