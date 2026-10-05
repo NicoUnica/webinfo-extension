@@ -1,20 +1,26 @@
 (function () {
-  const TITLES = { en: 'WebInfo — Privacy Policy', es: 'WebInfo — Política de privacidad' };
+  const TITLES = { en: 'WebInfo: Privacy', es: 'WebInfo: Privacidad' };
   const sections = document.querySelectorAll('[data-lang-section]');
-  const buttons = document.querySelectorAll('[data-lang]');
+  const links = document.querySelectorAll('[data-lang]');
 
   function apply(lang) {
     const l = lang === 'es' ? 'es' : 'en';
     document.documentElement.lang = l;
     document.title = TITLES[l];
     sections.forEach((s) => { s.hidden = s.dataset.langSection !== l; });
-    buttons.forEach((b) => {
-      const active = b.dataset.lang === l;
-      b.classList.toggle('active', active);
-      b.setAttribute('aria-pressed', String(active));
+    links.forEach((link) => {
+      if (link.dataset.lang === l) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
     });
   }
 
-  apply(/^es/i.test(navigator.language || '') ? 'es' : 'en');
-  buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.lang)));
+  let language = navigator.language || '';
+  try { language = chrome.i18n.getUILanguage() || language; } catch {}
+  const defaultLanguage = /^es/i.test(language) ? 'es' : 'en';
+  function applyFromHash() {
+    const lang = window.location.hash.slice(1);
+    apply(lang === 'es' || lang === 'en' ? lang : defaultLanguage);
+  }
+  applyFromHash();
+  window.addEventListener('hashchange', applyFromHash);
 })();
