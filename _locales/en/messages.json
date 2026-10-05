@@ -4,5 +4,86 @@
   },
   "extensionDescription": {
     "message": "See where every website is hosted. View its server country flag, IP, ASN, ISP, city and timezone."
+  },
+  "retry": {
+    "message": "Retry"
+  },
+  "domain": {
+    "message": "Domain"
+  },
+  "timezone": {
+    "message": "Time zone"
+  },
+  "openInMaps": {
+    "message": "Open in Maps"
+  },
+  "a11yLoading": {
+    "message": "Loading server information"
+  },
+  "a11yToggleSsl": {
+    "message": "Toggle SSL certificate details"
+  },
+  "a11yToggleWhois": {
+    "message": "Toggle WHOIS details"
+  },
+  "unsupportedPage": {
+    "message": "This page cannot be checked"
+  },
+  "resolveFailed": {
+    "message": "Unable to resolve server IP. Check your network and try again."
+  },
+  "fetchFailed": {
+    "message": "Unable to fetch IP information"
+  },
+  "sslDaysLeft": {
+    "message": "Expires in {days}d"
+  },
+  "sslExpired": {
+    "message": "Expired"
+  },
+  "sslUnknown": {
+    "message": "Unavailable"
+  },
+  "sslIssuer": {
+    "message": "Issuer"
+  },
+  "sslValidTo": {
+    "message": "Valid to"
+  },
+  "sslHost": {
+    "message": "Host"
+  },
+  "sourceDns": {
+    "message": "DNS"
+  },
+  "sourceDnsTitle": {
+    "message": "Resolved via DNS over HTTPS"
+  },
+  "locationSeparator": {
+    "message": ", "
+  },
+  "whoisRegistrar": {
+    "message": "Registrar"
+  },
+  "whoisCreated": {
+    "message": "Created"
+  },
+  "whoisExpires": {
+    "message": "Expires"
+  },
+  "privacy": {
+    "message": "Privacy"
+  },
+  "sourceIp": {
+    "message": "IP"
+  },
+  "sourceIpTitle": {
+    "message": "IP address from the active tab"
+  },
+  "mapUnavailable": {
+    "message": "Map unavailable"
+  },
+  "whoisUnknown": {
+    "message": "View details"
   }
 }

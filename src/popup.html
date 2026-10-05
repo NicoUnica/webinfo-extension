@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>WebInfo</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div id="app">
-    <span id="coords" hidden></span>
     <div id="loading" class="loading" role="status" data-i18n-aria="a11yLoading">
       <div class="spinner"></div>
     </div>
@@ -35,6 +35,7 @@
           <div class="spinner"></div>
         </div>
       </div>
+      <button id="map-open-direct" class="map-open-direct" type="button" data-i18n="openInMaps" hidden>Open in Maps</button>
       <div id="map-context-menu" class="map-context-menu" hidden>
         <button id="map-open" type="button" data-i18n="openInMaps">Open in Maps</button>
       </div>
@@ -71,12 +72,12 @@
             <span id="timezone" class="value-main plain-value"></span>
           </div>
         </div>
-        <div class="info-row ssl-row ssl-expanded">
+        <div class="info-row">
           <span class="label-cell">SSL</span>
           <div class="value-wrap">
-            <button id="ssl-toggle" class="value-main ssl-value" type="button" aria-expanded="false"></button>
+            <button id="ssl-toggle" aria-controls="ssl-details" data-i18n-aria="a11yToggleSsl" class="value-main ssl-value" type="button" aria-expanded="false"></button>
           </div>
-          <button class="expand-btn" type="button" data-expand="ssl-details" data-i18n-aria="a11yToggleSsl">
+          <button class="expand-btn" type="button" data-expand="ssl-details" aria-controls="ssl-details" aria-expanded="false" data-i18n-aria="a11yToggleSsl">
             <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
@@ -85,12 +86,12 @@
           <div><span data-i18n="sslValidTo">Valid to</span><strong id="ssl-valid-to">--</strong></div>
           <div><span data-i18n="sslHost">Host</span><strong id="ssl-host">--</strong></div>
         </div>
-        <div class="info-row whois-row whois-expanded">
+        <div class="info-row">
           <span class="label-cell">WHOIS</span>
           <div class="value-wrap">
-            <button id="whois-toggle" class="value-main whois-value" type="button" aria-expanded="false">--</button>
+            <button id="whois-toggle" aria-controls="whois-details" data-i18n-aria="a11yToggleWhois" class="value-main whois-value" type="button" aria-expanded="false">--</button>
           </div>
-          <button class="expand-btn" type="button" data-expand="whois-details" data-i18n-aria="a11yToggleWhois">
+          <button class="expand-btn" type="button" data-expand="whois-details" aria-controls="whois-details" aria-expanded="false" data-i18n-aria="a11yToggleWhois">
             <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
@@ -100,6 +101,9 @@
           <div><span data-i18n="whoisExpires">Expires</span><strong id="whois-expires">--</strong></div>
         </div>
       </div>
+      <footer class="footer">
+        <a href="../pages/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="privacy">Privacy</a>
+      </footer>
     </div>
   </div>
   <script src="popup.js"></script>

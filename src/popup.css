@@ -1,3 +1,5 @@
+@import url("../assets/fonts/afacad.css");
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -39,14 +41,16 @@ html {
 
 body {
   width: 320px;
-  font-family: "Ebrima", sans-serif;
-  font-weight: bold;
+  max-height: 600px;
+  font-family: "Afacad", "Segoe UI", sans-serif;
+  font-weight: 400;
   font-size: 13px;
   color: var(--text);
   background: var(--bg);
   border-radius: var(--radius);
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 ::-webkit-scrollbar {
@@ -118,6 +122,7 @@ body {
 .error-text { margin-bottom: 12px; }
 
 .error-retry {
+  font-family: inherit;
   display: inline-block;
   padding: 7px 18px;
   font-size: 12px;
@@ -153,14 +158,6 @@ body {
   background: transparent;
   cursor: default;
   image-rendering: auto;
-  image-rendering: high-quality;
-}
-
-.flag.flag-square {
-  width: 30px;
-  height: 30px;
-  border-radius: 4px;
-  object-fit: contain;
 }
 
 .header-info {
@@ -346,12 +343,10 @@ body {
   padding: 0 10px;
 }
 
-
-
 .label-cell {
   width: 70px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
   flex-shrink: 0;
 }
@@ -409,9 +404,14 @@ button:focus-visible {
   border-radius: 4px;
 }
 
-.ssl-value {
+.ssl-value,
+.whois-value {
+  appearance: none;
   border: 0;
+  border-radius: 0;
+  padding: 0;
   background: transparent;
+  box-shadow: none;
   font: inherit;
   color: var(--accent);
   cursor: pointer;
@@ -427,14 +427,6 @@ button:focus-visible {
 
 .ssl-value.muted {
   color: var(--text2);
-}
-
-.whois-value {
-  border: 0;
-  background: transparent;
-  font: inherit;
-  color: var(--accent);
-  cursor: pointer;
 }
 
 .whois-value.muted {
@@ -510,29 +502,6 @@ button:focus-visible {
   max-width: 180px;
 }
 
-.whois-details div {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-.whois-details div:last-child {
-  margin-bottom: 0;
-}
-
-.whois-details span {
-  color: var(--text2);
-}
-
-.whois-details strong {
-  color: var(--text);
-  text-align: right;
-  max-width: 70%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .source-badge {
   max-width: 44px;
   padding: 0;
@@ -548,31 +517,40 @@ button:focus-visible {
   text-overflow: ellipsis;
 }
 
-.ssl-details {
-  margin: -4px 12px 10px;
-  padding: 8px 10px;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 0 0 var(--radius-inner) var(--radius-inner);
-}
-
-@media (prefers-color-scheme: dark) {
-  .ssl-details { background: rgba(255, 255, 255, 0.04); }
-}
-
-.ssl-details div {
+.footer {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-  font-size: 11px;
-  line-height: 1.8;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 12px;
+  font-size: 10px;
+  font-weight: 400;
   color: var(--text2);
 }
 
-.ssl-details strong {
-  color: var(--text);
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.footer a {
+  margin-left: auto;
+  color: var(--accent);
+  text-decoration: none;
 }
+
+.map-open-direct {
+  margin: 6px 12px 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+button:disabled { cursor: default; }
+.expand-btn:disabled { opacity: 0.35; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
