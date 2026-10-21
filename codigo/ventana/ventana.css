@@ -1,0 +1,54 @@
+@import url("../../recursos/estilos/base.css");
+* { margin: 0; padding: 0; }
+body { width: 340px; max-height: 600px; overflow-x: hidden; overflow-y: auto; font-size: 13px; line-height: 1.3; }
+#aplicacion { padding: 8px; }
+.barra, .pie { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.barra { padding-bottom: 4px; border-bottom: 1px solid var(--separador); }
+.marca { font-size: 15px; }
+.boton-texto { border: 0; background: transparent; color: var(--acento); padding: 4px; min-height: 26px; border-radius: 4px; font-size: 12px; }
+.boton-texto:hover:not(:disabled) { background: var(--superficie); }
+.boton-texto:disabled { color: var(--atenuado); }
+.boton-principal { background: var(--fondo-boton); color: var(--texto-boton); border: 0; border-radius: 8px; padding: 8px 16px; margin-top: 12px; }
+.cargando { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 32px 0; color: var(--atenuado); }
+.indicador-carga { width: 20px; height: 20px; flex-shrink: 0; border: 2px solid var(--separador); border-top-color: var(--acento); border-radius: 50%; animation: girar .7s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+.mensaje-estado { padding: 24px 4px; text-align: center; color: var(--atenuado); }
+.cabecera { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+.bandera { width: 40px; height: 30px; object-fit: contain; border-radius: 4px; flex-shrink: 0; }
+.datos-cabecera { min-width: 0; }
+.nombre-pais { font-size: 16px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.texto-ciudad { font-size: 12px; color: var(--atenuado); margin-top: 3px; overflow-wrap: anywhere; }
+.estado-ubicacion { font-size: 12px; color: var(--atenuado); }
+.estado-ubicacion p { margin-bottom: 8px; }
+.marco-mapa { position: relative; overflow: hidden; height: 130px; border: 1px solid var(--separador); border-radius: var(--radio); background: var(--superficie); }
+.cuadricula-mapa { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.mosaico-mapa { position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; }
+.marcador-mapa { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border: 3px solid #fff; border-radius: 50%; background: #005fcc; box-shadow: 0 1px 6px #0006; pointer-events: none; }
+.atribucion-mapa { position: absolute; bottom: 4px; right: 4px; z-index: 2; padding: 3px 5px; background: var(--fondo); color: var(--texto); border-radius: 4px; font-size: 10px; }
+.carga-mapa { position: absolute; top: 4px; left: 4px; right: 4px; width: fit-content; max-width: calc(100% - 8px); background: var(--fondo); color: var(--atenuado); padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+.abrir-mapa { margin-top: 2px; }
+.lista-informacion { margin-top: 6px; background: var(--superficie); border: 1px solid var(--separador); border-radius: var(--radio); overflow: hidden; }
+.fila-informacion { display: flex; align-items: baseline; gap: 8px; min-height: 28px; padding: 5px 10px; }
+.etiqueta-fila { width: 72px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: var(--texto); }
+.contenedor-valor { display: flex; align-items: baseline; gap: 8px; flex: 1; min-width: 0; }
+.valor-principal, .valor-panel { flex: 1; min-width: 0; overflow-wrap: anywhere; text-align: left; font-size: 12px; }
+.valor-texto { color: var(--atenuado); }
+.enlace-valor { text-decoration: none; }
+.enlace-valor:hover { text-decoration: underline; }
+.enlace-valor.deshabilitado { color: var(--atenuado); text-decoration: none; cursor: text; }
+.distintivo-origen { font-size: 10px; font-weight: 600; color: var(--atenuado); }
+.panel-detalles { border-top: 1px solid var(--separador); }
+.panel-detalles h2 { font-size: inherit; font-weight: inherit; }
+.alternar-panel { display: flex; align-items: baseline; gap: 8px; width: 100%; min-height: 30px; text-align: left; padding: 7px 10px; color: var(--acento); border: 0; background: transparent; }
+.alternar-panel:hover:not(:disabled) { background: var(--fondo); }
+.alternar-panel svg { align-self: center; width: 12px; height: 12px; flex-shrink: 0; transition: transform .15s; }
+.alternar-panel[aria-expanded="true"] svg { transform: rotate(180deg); }
+.alternar-panel:disabled svg { opacity: .4; }
+.detalles-panel { padding: 0 10px 8px; font-size: 12px; }
+.detalles-panel dl > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 3px 0; }
+.detalles-panel dt { color: var(--atenuado); flex-shrink: 0; }
+.detalles-panel dd { text-align: right; overflow-wrap: anywhere; min-width: 0; font-weight: 600; }
+.pie { margin-top: 4px; font-size: 12px; }
+.pie a { padding: 4px; }
+.estado-copia { font-size: 12px; color: var(--atenuado); padding: 0 4px; }
+.estado-copia:empty { display: none; }

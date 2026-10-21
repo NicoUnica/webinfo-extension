@@ -1,0 +1,10 @@
+.DS_Store
+
+# Archivos comprimidos de distribución local
+WebInfo-*.zip
+distribucion/
+
+# Archivos locales del sistema y del editor
+.vscode/
+.idea/
+*.log

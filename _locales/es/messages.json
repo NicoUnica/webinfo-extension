@@ -1,0 +1,143 @@
+{
+  "nombreExtension": {
+    "message": "WebInfo"
+  },
+  "descripcionExtension": {
+    "message": "Vea el país del servidor web de un vistazo y consulte información de IP, ASN, ISP, ciudad y zona horaria."
+  },
+  "reintentar": {
+    "message": "Reintentar"
+  },
+  "dominio": {
+    "message": "Dominio"
+  },
+  "zonaHoraria": {
+    "message": "Zona horaria"
+  },
+  "abrirEnMapas": {
+    "message": "Abrir en mapas"
+  },
+  "cargaAccesible": {
+    "message": "Cargando información del servidor"
+  },
+  "paginaNoCompatible": {
+    "message": "Esta página no puede ser verificada"
+  },
+  "resolucionFallida": {
+    "message": "No se pudo resolver la IP del servidor. Verifica tu red e intenta de nuevo."
+  },
+  "diasSslRestantes": {
+    "message": "Expira en {dias}d"
+  },
+  "sslCaducado": {
+    "message": "Expirado"
+  },
+  "sslNoDisponible": {
+    "message": "No disponible"
+  },
+  "emisorSsl": {
+    "message": "Emisor"
+  },
+  "validezSsl": {
+    "message": "Válido hasta"
+  },
+  "dominioSsl": {
+    "message": "Dominio"
+  },
+  "origenDns": {
+    "message": "DNS"
+  },
+  "descripcionOrigenDns": {
+    "message": "IP resuelta mediante DNS público sobre HTTPS; puede diferir de la conexión del navegador."
+  },
+  "separadorUbicacion": {
+    "message": ", "
+  },
+  "registradorWhois": {
+    "message": "Registrador"
+  },
+  "creacionWhois": {
+    "message": "Creado"
+  },
+  "caducidadWhois": {
+    "message": "Expira"
+  },
+  "privacidad": {
+    "message": "Privacidad"
+  },
+  "origenIp": {
+    "message": "IP"
+  },
+  "descripcionOrigenIp": {
+    "message": "Dirección IP de la pestaña activa"
+  },
+  "mapaNoDisponible": {
+    "message": "Mapa no disponible"
+  },
+  "whoisSinRegistrador": {
+    "message": "Ver detalles"
+  },
+  "actualizar": {
+    "message": "Actualizar"
+  },
+  "fechaConsulta": {
+    "message": "Consultado: {hora}"
+  },
+  "datosCargando": {
+    "message": "Cargando…"
+  },
+  "sinDatos": {
+    "message": "Sin datos disponibles"
+  },
+  "noAplicable": {
+    "message": "No aplicable"
+  },
+  "limiteAlcanzado": {
+    "message": "Límite del servicio alcanzado. Espera antes de reintentar."
+  },
+  "tiempoAgotado": {
+    "message": "El servicio ha tardado demasiado. Reinténtalo."
+  },
+  "errorServicio": {
+    "message": "El servicio no está disponible temporalmente."
+  },
+  "errorRed": {
+    "message": "No se pudo conectar. Comprueba la conexión y reintenta."
+  },
+  "redLocal": {
+    "message": "Las direcciones locales o reservadas no se envían a servicios públicos de consulta."
+  },
+  "tituloRedLocal": {
+    "message": "Red local o reservada"
+  },
+  "ubicacionNoDisponible": {
+    "message": "Ubicación no disponible"
+  },
+  "ubicacionAproximada": {
+    "message": "Ubicación aproximada de la IP"
+  },
+  "alcanceSsl": {
+    "message": "Consulta externa HTTPS:443. Puede diferir del certificado del navegador."
+  },
+  "notaUbicacion": {
+    "message": "Ubicación de una IP resuelta mediante DNS público. Las CDN, los proxies y tu navegador pueden utilizar otro servidor."
+  },
+  "mapaCargando": {
+    "message": "Cargando mapa…"
+  },
+  "mapaParcial": {
+    "message": "No se pudieron cargar algunas partes del mapa."
+  },
+  "copiarResumen": {
+    "message": "Copiar resumen"
+  },
+  "resumenCopiado": {
+    "message": "Resumen copiado."
+  },
+  "copiaFallida": {
+    "message": "No se pudo copiar. Selecciona la información y cópiala manualmente."
+  },
+  "aperturaFallida": {
+    "message": "No se pudo abrir Mapas. Reinténtalo."
+  }
+}

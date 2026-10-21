@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebInfo</title>
+  <link rel="stylesheet" href="ventana.css">
+  <script src="../servicios/consultas.js" defer></script>
+  <script src="ventana.js" defer></script>
+</head>
+<body>
+  <div id="aplicacion">
+    <header class="barra"><span class="marca">WebInfo</span><button id="actualizar" class="boton-texto" type="button" data-i18n="actualizar">Actualizar</button></header>
+    <div id="cargando" class="cargando" role="status"><span class="indicador-carga" aria-hidden="true"></span><span data-i18n="cargaAccesible">Cargando información del servidor</span></div>
+    <div id="error" class="mensaje-estado" hidden><p id="mensaje-error" role="alert"></p><button id="reintentar-error" class="boton-principal" type="button" data-i18n="reintentar">Reintentar</button></div>
+    <main id="contenido" hidden>
+      <section id="region-ubicacion" aria-busy="false" aria-describedby="nota-ubicacion" data-i18n-aria="ubicacionAproximada">
+        <div class="cabecera"><img id="imagen-bandera" class="bandera" alt="" hidden><div class="datos-cabecera"><h1 id="pais" class="nombre-pais"></h1><p id="ciudad-region" class="texto-ciudad"></p></div></div>
+        <div class="estado-ubicacion"><p id="mensaje-ubicacion" role="status" hidden></p><button id="reintentar-ubicacion" class="boton-texto" type="button" data-i18n="reintentar" hidden>Reintentar</button></div>
+        <div id="contenedor-mapa" class="marco-mapa" hidden><div id="cuadricula-mapa" class="cuadricula-mapa"></div><div class="marcador-mapa" aria-hidden="true"></div><a class="atribucion-mapa" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap</a><div id="carga-mapa" class="carga-mapa" role="status"></div></div>
+        <button id="abrir-mapa" class="boton-texto abrir-mapa" type="button" data-i18n="abrirEnMapas" hidden>Abrir en mapas</button>
+      </section>
+      <div class="lista-informacion">
+        <div class="fila-informacion"><span id="ip-etiqueta" class="etiqueta-fila">IP</span><div class="contenedor-valor"><a id="ip" class="valor-principal enlace-valor" target="_blank" rel="noopener noreferrer">--</a><span id="origen-ip" class="distintivo-origen"></span></div></div>
+        <div class="fila-informacion"><span id="dominio-etiqueta" class="etiqueta-fila" data-i18n="dominio">Dominio</span><div class="contenedor-valor"><a id="dominio" class="valor-principal enlace-valor" target="_blank" rel="noopener noreferrer">--</a></div></div>
+        <div class="fila-informacion"><span id="asn-etiqueta" class="etiqueta-fila">ASN</span><div class="contenedor-valor"><a id="asn" class="valor-principal enlace-valor" target="_blank" rel="noopener noreferrer">--</a></div></div>
+        <div class="fila-informacion"><span id="isp-etiqueta" class="etiqueta-fila">ISP</span><div class="contenedor-valor"><span id="isp" class="valor-principal valor-texto">--</span></div></div>
+        <div class="fila-informacion"><span id="zonaHoraria-etiqueta" class="etiqueta-fila" data-i18n="zonaHoraria">Zona horaria</span><div class="contenedor-valor"><span id="zonaHoraria" class="valor-principal valor-texto">--</span></div></div>
+        <section class="panel-detalles" aria-label="SSL">
+          <h2><button id="ssl-alternar" class="alternar-panel" type="button" aria-controls="ssl-detalles" aria-expanded="false" aria-describedby="ssl-alcance"><span class="etiqueta-fila">SSL</span><span id="ssl-valor" class="valor-panel" aria-live="polite">--</span><svg aria-hidden="true" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button></h2>
+          <div id="ssl-detalles" class="detalles-panel" hidden>
+            <p id="ssl-mensaje" class="atenuado" hidden></p>
+            <dl id="ssl-campos"><div><dt data-i18n="emisorSsl">Emisor</dt><dd id="ssl-emisor">--</dd></div><div><dt data-i18n="validezSsl">Válido hasta</dt><dd id="ssl-validez">--</dd></div><div><dt data-i18n="dominioSsl">Dominio</dt><dd id="ssl-dominio">--</dd></div></dl>
+            <button id="ssl-reintentar" class="boton-texto" type="button" data-i18n="reintentar" hidden>Reintentar</button>
+          </div>
+        </section>
+        <section class="panel-detalles" aria-label="WHOIS">
+          <h2><button id="whois-alternar" class="alternar-panel" type="button" aria-controls="whois-detalles" aria-expanded="false"><span class="etiqueta-fila">WHOIS</span><span id="whois-valor" class="valor-panel" aria-live="polite">--</span><svg aria-hidden="true" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button></h2>
+          <div id="whois-detalles" class="detalles-panel" hidden>
+            <p id="whois-mensaje" class="atenuado" hidden></p>
+            <dl id="whois-campos"><div><dt data-i18n="registradorWhois">Registrador</dt><dd id="whois-registrador">--</dd></div><div><dt data-i18n="creacionWhois">Creado</dt><dd id="whois-creacion">--</dd></div><div><dt data-i18n="caducidadWhois">Expira</dt><dd id="whois-caducidad">--</dd></div></dl>
+
+            <button id="whois-reintentar" class="boton-texto" type="button" data-i18n="reintentar" hidden>Reintentar</button>
+          </div>
+        </section>
+      </div>
+      <p id="nota-ubicacion" class="solo-lectores" data-i18n="notaUbicacion">Ubicación de una IP resuelta mediante DNS público. Las CDN, los proxies y tu navegador pueden utilizar otro servidor.</p>
+      <p id="ssl-alcance" class="solo-lectores" data-i18n="alcanceSsl">Consulta externa HTTPS:443. Puede diferir del certificado del navegador.</p>
+      <footer class="pie"><button id="copiar-resumen" class="boton-texto" type="button" data-i18n="copiarResumen">Copiar resumen</button><a href="../../paginas/privacidad.html" target="_blank" rel="noopener noreferrer" data-i18n="privacidad">Privacidad</a></footer>
+      <p id="estado-copia" class="estado-copia" role="status"></p>
+    </main>
+  </div>
+</body>
+</html>
